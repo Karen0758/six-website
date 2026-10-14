@@ -39,7 +39,7 @@ export const DEFAULT_EDITOR_CONFIG: EditorConfig = {
   layers: {
     background: { x: 0, y: 0, scale: 1, zIndex: 0 },
     leftFigure: { x: 0, y: 0, scale: 1.15, zIndex: 4 },
-    centerFigure: { x: 0, y: 0, scale: 1, zIndex: 4 },
+    centerFigure: { x: 0, y: 0, scale: 1, zIndex: 5 },
     rightFigure: { x: 0, y: 0, scale: 1, zIndex: 1 },
     pinkReveal: { x: 0, y: 0, scale: 1, zIndex: 3 },
     headline: { x: 0, y: 0, scale: 1, zIndex: 2 },
@@ -142,4 +142,25 @@ export function resetEditorConfig(storage?: StorageLike | null): boolean {
 
 export function exportEditorConfig(config: EditorConfig): string {
   return JSON.stringify(resolveEditorConfig(DEFAULT_EDITOR_CONFIG, config), null, 2);
+}
+
+export function layerStyle(transform: LayerTransform, width = 1676, height = 939, origin = 'center center') {
+  const x = Number((transform.x / width * 100).toFixed(3));
+  const y = Number((transform.y / height * 100).toFixed(3));
+  return {
+    transform: `translate(${x}vw, ${y}vh) scale(${transform.scale})`,
+    transformOrigin: origin,
+    zIndex: transform.zIndex,
+  };
+}
+
+export function moveLayerOrder(config: EditorConfig, id: LayerId, direction: -1 | 1): EditorConfig {
+  const ordered = [...LAYER_IDS].sort((a, b) => config.layers[a].zIndex - config.layers[b].zIndex || LAYER_IDS.indexOf(a) - LAYER_IDS.indexOf(b));
+  const index = ordered.indexOf(id);
+  const next = index + direction;
+  if (next < 0 || next >= ordered.length) return config;
+  [ordered[index], ordered[next]] = [ordered[next], ordered[index]];
+  const layers = { ...config.layers };
+  ordered.forEach((layerId, zIndex) => { layers[layerId] = { ...layers[layerId], zIndex }; });
+  return { ...config, layers };
 }

@@ -5,6 +5,7 @@ import {
   clampLayerTransform,
   exportEditorConfig,
   loadEditorConfig,
+  moveLayerOrder,
   resetEditorConfig,
   resolveEditorConfig,
   saveEditorConfig,
@@ -64,6 +65,22 @@ test('save and reload preserve edits; reset removes the local override', () => {
   assert.equal(loadEditorConfig(storage).text.button, '进入');
   resetEditorConfig(storage);
   assert.deepEqual(loadEditorConfig(storage), DEFAULT_EDITOR_CONFIG);
+});
+
+test('layer order remains a unique complete stack and respects both ends', () => {
+  const moved = moveLayerOrder(DEFAULT_EDITOR_CONFIG, 'leftFigure', 1);
+  const z = Object.values(moved.layers).map(layer => layer.zIndex).sort((a, b) => a - b);
+  assert.deepEqual(z, [0, 1, 2, 3, 4, 5]);
+  assert.equal(moved.layers.leftFigure.zIndex, 5);
+  assert.deepEqual(moveLayerOrder(DEFAULT_EDITOR_CONFIG, 'leftFigure', 1).layers, moved.layers);
+  const atBottom = { ...DEFAULT_EDITOR_CONFIG, layers: { ...DEFAULT_EDITOR_CONFIG.layers, background: { ...DEFAULT_EDITOR_CONFIG.layers.background, zIndex: 0 } } };
+  assert.deepEqual(moveLayerOrder(atBottom, 'background', -1).layers, atBottom.layers);
+});
+
+test('storage write and reset failures do not interrupt editing', () => {
+  const blocked = { getItem() { return null; }, setItem() { throw new Error('blocked'); }, removeItem() { throw new Error('blocked'); } };
+  assert.equal(saveEditorConfig(DEFAULT_EDITOR_CONFIG, blocked), false);
+  assert.equal(resetEditorConfig(blocked), false);
 });
 
 test('exportEditorConfig creates stable pretty JSON', () => {
