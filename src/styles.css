@@ -1,1 +1,116 @@
-:root{font-family:system-ui,-apple-system,"PingFang SC",sans-serif;color:#f8ead3;background:#4e1a41;font-synthesis:none;font-optical-sizing:auto}*{box-sizing:border-box}html,body,#root{width:100%;height:100%;margin:0}body{overflow:hidden}.scene{position:relative;width:100vw;height:100vh;height:100svh;overflow:hidden;isolation:isolate;background:#4e1a41}.background,.figure{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;user-select:none;pointer-events:none}.background{z-index:0}.figure{z-index:1;mix-blend-mode:multiply}.figure-sequence{position:absolute;inset:0;width:100%;height:100%;z-index:4;mix-blend-mode:multiply;pointer-events:none}.pink-wave{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}.headline{position:absolute;z-index:2;left:7%;top:19%;width:min(45vw,720px);pointer-events:none;color:#f8ead3;transition:opacity .25s}.headline small{font-size:clamp(11px,1.15vw,20px);letter-spacing:.18em}.headline h1{font-family:Georgia,"Songti SC",serif;font-size:clamp(36px,5vw,84px);font-weight:400;line-height:1.2;margin:1.15em 0 .55em}.headline p{font-family:"Songti SC",serif;font-size:clamp(14px,1.55vw,25px);line-height:1.8;margin:0 0 1.5em}.learn-more{pointer-events:auto;border:1px solid #f8ead3;border-radius:99px;background:transparent;color:#f8ead3;padding:12px 25px;font:inherit;cursor:pointer}.learn-more:disabled{opacity:.7}.headline-exiting{opacity:0}.figure-hit{position:absolute;z-index:5;left:0;top:28.75%;width:37.5%;height:62.5%;border:0;background:transparent;cursor:pointer}.figure-hit:focus-visible{outline:2px dashed #fff;outline-offset:-4px}.loading-note,.error-note{position:absolute;z-index:6;left:50%;bottom:3vh;transform:translateX(-50%);padding:9px 16px;border-radius:99px;background:#fff;color:#473541;font-size:14px}.error-note{background:#ffdedf;color:#801b28}.pink-wave-active{animation:none}@media(prefers-reduced-motion:reduce){.headline{transition:none}}
+:root {
+  font-family: system-ui, -apple-system, "PingFang SC", sans-serif;
+  color: #f8ead3;
+  background: #4e1a41;
+  font-synthesis: none;
+  font-optical-sizing: auto;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { width: 100%; height: 100%; margin: 0; }
+body { overflow: hidden; }
+
+.scene {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: #4e1a41;
+}
+
+.background, .figure {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+}
+.background { z-index: 0; }
+.figure { z-index: 1; mix-blend-mode: multiply; }
+.figure-sequence {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.pink-wave, .yellow-wave {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.headline {
+  position: absolute;
+  z-index: 2;
+  left: 7%;
+  top: 19%;
+  width: min(45vw, 720px);
+  pointer-events: none;
+  color: #f8ead3;
+  transition: opacity .25s;
+}
+.headline small { font-size: clamp(11px, 1.15vw, 20px); letter-spacing: .18em; }
+.headline h1 {
+  font-family: Georgia, "Songti SC", serif;
+  font-size: clamp(36px, 5vw, 84px);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 1.15em 0 .55em;
+}
+.headline p {
+  font-family: "Songti SC", serif;
+  font-size: clamp(14px, 1.55vw, 25px);
+  line-height: 1.8;
+  margin: 0 0 1.5em;
+}
+.learn-more {
+  pointer-events: auto;
+  border: 1px solid #f8ead3;
+  border-radius: 99px;
+  background: transparent;
+  color: #f8ead3;
+  padding: 12px 25px;
+  font: inherit;
+  cursor: pointer;
+}
+.learn-more:disabled { opacity: .7; }
+.headline-exiting { opacity: 0; }
+
+.figure-hit {
+  position: absolute;
+  z-index: 5;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.figure-hit-left { left: 15%; top: 50%; width: 14%; height: 45%; }
+.figure-hit-middle { left: 43%; top: 32%; width: 23%; height: 66%; }
+.figure-hit:focus-visible { outline: 2px dashed #fff; outline-offset: -4px; }
+
+.loading-note, .error-note {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  bottom: 3vh;
+  transform: translateX(-50%);
+  padding: 9px 16px;
+  border-radius: 99px;
+  background: #fff;
+  color: #473541;
+  font-size: 14px;
+}
+.error-note { background: #ffdedf; color: #801b28; }
+
+@media (prefers-reduced-motion: reduce) {
+  .headline { transition: none; }
+}
