@@ -13,7 +13,11 @@ SOURCE_FPS = 24
 OUTPUT_FPS = 12
 CANVAS = (628, 586)
 FIXED_SCALE = 1.35  # Fixed across the sequence to avoid zoom drift and keep the head in frame
-SOURCE_INDICES = list(range(0, 37, 4)) + list(range(38, 121, 2))
+SOURCE_STEP = SOURCE_FPS // OUTPUT_FPS
+
+
+def sample_indices(frame_count: int):
+    return list(range(0, frame_count, SOURCE_STEP))
 
 
 def connect_floor_shadow(canvas: Image.Image):
@@ -62,23 +66,28 @@ def connect_floor_shadow(canvas: Image.Image):
 def build(frames_dir: Path, output: Path):
     output.mkdir(parents=True, exist_ok=True)
     frames = sorted(frames_dir.glob('frame_*.png'))
-    if len(frames) != 121:
-        raise ValueError(f'Expected 121 source frames, found {len(frames)}')
-    for out_index, source_index in enumerate(SOURCE_INDICES):
+    if not frames:
+        raise ValueError('No source frames found')
+    indices = sample_indices(len(frames))
+    for stale in output.glob('frame_*.webp'):
+        stale.unlink()
+    for out_index, source_index in enumerate(indices):
         source = Image.open(frames[source_index]).convert('L')
-        neutral = float(ImageStat.Stat(source.crop((1000, 0, 1230, 80))).median[0])
+        width, height = source.size
+        neutral_crop = (round(width * 0.80), 0, round(width * 0.98), min(80, height))
+        neutral = float(ImageStat.Stat(source.crop(neutral_crop)).median[0])
         factor = 255.0 / max(neutral, 1.0)
         ink = source.point(lambda value: min(255, round(value * factor)))
         ink = ink.point(lambda value: 255 if value >= 250 else value)
         scale = FIXED_SCALE
-        tile = ink.resize((round(1256 * scale / 2), round(732 * scale / 2)), Image.Resampling.LANCZOS)
+        tile = ink.resize((round(width * scale / 2), round(height * scale / 2)), Image.Resampling.LANCZOS)
         canvas = Image.new('L', CANVAS, 255)
         x = round((700 - 700 * scale) / 2 - 150)
         y = round((1130 - 660 * scale) / 2)
         canvas.paste(tile, (x, y))
         connect_floor_shadow(canvas)
         canvas.save(output / f'frame_{out_index:03d}.webp', format='WEBP', quality=78, method=5)
-    return FIXED_SCALE
+    return FIXED_SCALE, len(indices)
 
 
 def main():
@@ -89,16 +98,16 @@ def main():
     parser.add_argument('--output', type=Path, default=Path('public/media/seated'))
     args = parser.parse_args()
     if args.frames_dir:
-        scale = build(args.frames_dir, args.output)
+        scale, count = build(args.frames_dir, args.output)
     else:
         with TemporaryDirectory() as temp:
             folder = Path(temp)
             subprocess.run(['ffmpeg', '-v', 'error', '-i', str(args.video), '-map', '0:v:0',
                             '-fps_mode', 'passthrough', '-start_number', '0',
                             str(folder / 'frame_%04d.png')], check=True)
-            scale = build(folder, args.output)
+            scale, count = build(folder, args.output)
     size = sum(p.stat().st_size for p in args.output.glob('frame_*.webp'))
-    print(f'frames={len(SOURCE_INDICES)} fps={OUTPUT_FPS} duration={len(SOURCE_INDICES)/OUTPUT_FPS:.2f}s '
+    print(f'frames={count} fps={OUTPUT_FPS} duration={count/OUTPUT_FPS:.2f}s '
           f'fixed_scale={scale:.2f} bytes={size}')
 
 

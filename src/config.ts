@@ -4,7 +4,7 @@ export const hero = {
   seated: {
     label: '坐着的女性',
     framePath: (i: number) => `./media/seated/frame_${String(i).padStart(3, '0')}.webp`,
-    count: 52, fps: 12, box: { x: 0, y: 270, width: 628, height: 586 },
+    count: 37, fps: 12, box: { x: 0, y: 270, width: 628, height: 586 },
   },
   middle: {
     label: '转向镜头的女性',
