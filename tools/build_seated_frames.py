@@ -43,8 +43,9 @@ def bridge_shadow(canvas: Image.Image):
     sy = int(np.median(sy_values))
     fy = int(np.median(fy_values))
     draw = ImageDraw.Draw(canvas)
-    draw.polygon([(sx-9, sy-4), (fx+3, fy-2), (fx+5, fy+2), (sx-9, sy+5)], fill=69)
-    draw.line([(sx-11, sy+1), (fx+4, fy)], fill=42, width=1)
+    draw.polygon([(sx-18, sy-10), (sx+5, sy-5), (fx+4, fy-2),
+                  (fx+6, fy+2), (sx+3, sy+6), (sx-18, sy+11)], fill=58)
+    draw.line([(sx-16, sy+1), (fx+4, fy)], fill=38, width=2)
 
 
 def build(frames_dir: Path, output: Path):
@@ -66,7 +67,7 @@ def build(frames_dir: Path, output: Path):
         x = round((700 - 700 * scale) / 2)
         y = round((1130 - 660 * scale) / 2)
         canvas.paste(tile, (x, y))
-        if source_index >= 78:
+        if source_index >= 68:
             bridge_shadow(canvas)
         canvas.save(output / f'frame_{out_index:03d}.webp', format='WEBP', quality=78, method=5)
     return scales
