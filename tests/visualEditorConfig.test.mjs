@@ -1,0 +1,72 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  DEFAULT_EDITOR_CONFIG,
+  clampLayerTransform,
+  exportEditorConfig,
+  loadEditorConfig,
+  resetEditorConfig,
+  resolveEditorConfig,
+  saveEditorConfig,
+} from '../src/visualEditorConfig.ts';
+
+function memoryStorage(initial = null) {
+  let value = initial;
+  return {
+    getItem: () => value,
+    setItem: (_key, next) => { value = next; },
+    removeItem: () => { value = null; },
+    read: () => value,
+  };
+}
+
+test('defaults define editable layers and homepage text', () => {
+  assert.deepEqual(Object.keys(DEFAULT_EDITOR_CONFIG.layers), [
+    'background', 'leftFigure', 'centerFigure', 'rightFigure', 'pinkReveal', 'headline',
+  ]);
+  assert.equal(DEFAULT_EDITOR_CONFIG.layers.leftFigure.scale, 1.15);
+  assert.deepEqual(Object.keys(DEFAULT_EDITOR_CONFIG.text), ['eyebrow', 'title', 'description', 'button']);
+});
+
+test('resolveEditorConfig merges overrides without mutating defaults', () => {
+  const resolved = resolveEditorConfig(DEFAULT_EDITOR_CONFIG, {
+    layers: { leftFigure: { x: 40 } }, text: { title: '自定义标题' },
+  });
+  assert.equal(resolved.layers.leftFigure.x, 40);
+  assert.equal(resolved.layers.leftFigure.scale, 1.15);
+  assert.equal(resolved.text.title, '自定义标题');
+  assert.notEqual(DEFAULT_EDITOR_CONFIG.layers.leftFigure.x, 40);
+});
+
+test('clampLayerTransform bounds coordinates, scale, and order', () => {
+  assert.deepEqual(clampLayerTransform({ x: 4000, y: -1200, scale: 9, zIndex: 123.4 }), {
+    x: 1676, y: -939, scale: 3, zIndex: 99,
+  });
+  assert.deepEqual(clampLayerTransform({ x: NaN, y: Infinity, scale: 0, zIndex: -4 }), {
+    x: 0, y: 0, scale: 0.25, zIndex: 0,
+  });
+});
+
+test('loadEditorConfig falls back safely for malformed and invalid storage', () => {
+  assert.deepEqual(loadEditorConfig(memoryStorage('{broken')), DEFAULT_EDITOR_CONFIG);
+  const invalid = JSON.stringify({ layers: { leftFigure: { scale: 100 } }, text: { title: 42 } });
+  const loaded = loadEditorConfig(memoryStorage(invalid));
+  assert.equal(loaded.layers.leftFigure.scale, 1.15);
+  assert.equal(loaded.text.title, DEFAULT_EDITOR_CONFIG.text.title);
+  assert.deepEqual(loadEditorConfig(null), DEFAULT_EDITOR_CONFIG);
+  assert.deepEqual(loadEditorConfig({ getItem() { throw new Error('blocked'); } }), DEFAULT_EDITOR_CONFIG);
+});
+
+test('save and reload preserve edits; reset removes the local override', () => {
+  const storage = memoryStorage();
+  const config = resolveEditorConfig(DEFAULT_EDITOR_CONFIG, { text: { button: '进入' } });
+  saveEditorConfig(config, storage);
+  assert.equal(loadEditorConfig(storage).text.button, '进入');
+  resetEditorConfig(storage);
+  assert.deepEqual(loadEditorConfig(storage), DEFAULT_EDITOR_CONFIG);
+});
+
+test('exportEditorConfig creates stable pretty JSON', () => {
+  const exported = exportEditorConfig(DEFAULT_EDITOR_CONFIG);
+  assert.equal(exported, JSON.stringify(DEFAULT_EDITOR_CONFIG, null, 2));
+});
