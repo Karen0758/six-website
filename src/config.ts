@@ -9,7 +9,7 @@ export const hero = {
   middle: {
     label: '转向镜头的女性',
     framePath: (i: number) => `./media/middle/frame_${String(i).padStart(3, '0')}.webp`,
-    count: 20, fps: 12, box: { x: 400, y: 0, width: 628, height: 939 },
+    count: 20, fps: 12, box: { x: 595, y: 320, width: 364, height: 545 },
   },
   leaning: { label: '倚墙的女性', image: './media/leaning.webp' },
   walker: { label: '行走的女性', image: './media/walker.webp' },
