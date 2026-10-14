@@ -81,7 +81,7 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
 
   return <main className="scene" aria-label="SIX 官网首页主视觉">
     <img className="background" src={hero.background} width={hero.width} height={hero.height} alt="" fetchPriority="high" style={styleFor('background')} />
-    <img className="figure figure-leaning" src={hero.leaning.image} width={hero.width} height={hero.height} alt={hero.leaning.label} style={styleFor('rightFigure')} />
+    <img className="figure figure-leaning" src={hero.leaning.image} width={hero.width} height={hero.height} alt={hero.leaning.label} style={styleFor('centerFigure')} />
     <img className="figure figure-walker" src={hero.walker.image} width={hero.width} height={hero.height} alt={hero.walker.label} style={styleFor('rightFigure')} />
 
     <div className={`headline ${scene !== 'home' ? 'headline-exiting' : ''}`} style={styleFor('headline')}>

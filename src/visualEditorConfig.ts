@@ -70,6 +70,8 @@ export function resolveEditorConfig(defaults: EditorConfig, overrides: EditorCon
     id,
     clampLayerTransform({ ...defaults.layers[id], ...overrides.layers?.[id] }),
   ])) as Record<LayerId, LayerTransform>;
+  const ordered = [...LAYER_IDS].sort((a, b) => layers[a].zIndex - layers[b].zIndex || LAYER_IDS.indexOf(a) - LAYER_IDS.indexOf(b));
+  ordered.forEach((id, zIndex) => { layers[id] = { ...layers[id], zIndex }; });
   const text = { ...defaults.text };
   for (const key of Object.keys(text) as (keyof HomeText)[]) {
     const value = overrides.text?.[key];
@@ -152,6 +154,13 @@ export function layerStyle(transform: LayerTransform, width = 1676, height = 939
     transformOrigin: origin,
     zIndex: transform.zIndex,
   };
+}
+
+export function parseNumericDraft(value: string, min: number, max: number): number | null {
+  if (value.trim() === '' || value === '-' || value === '.' || value === '-.') return null;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return null;
+  return Math.max(min, Math.min(max, parsed));
 }
 
 export function moveLayerOrder(config: EditorConfig, id: LayerId, direction: -1 | 1): EditorConfig {
