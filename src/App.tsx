@@ -61,13 +61,13 @@ export default function App() {
     <svg className={`pink-wave ${started ? 'pink-wave-active' : ''}`} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
       <defs>
         <clipPath id="wave-clip" clipPathUnits="userSpaceOnUse"><path d={wavePath(progress)} /></clipPath>
-        <pattern id="pink-paper" width="12" height="12" patternUnits="userSpaceOnUse">
-          <image href="/media/pink-texture.webp" width="12" height="12" preserveAspectRatio="none" />
+        <pattern id="pink-paper" width="18" height="34" patternUnits="userSpaceOnUse">
+          <image href="/media/pink-texture.webp" width="18" height="34" preserveAspectRatio="none" />
         </pattern>
       </defs>
       <g clipPath="url(#wave-clip)">
         <rect width="100" height="100" fill="#f23a64" />
-        <rect width="100" height="100" fill="url(#pink-paper)" opacity=".2" />
+        <rect width="100" height="100" fill="url(#pink-paper)" opacity=".86" />
       </g>
     </svg>
 
