@@ -1,65 +1,67 @@
 import { useEffect, useRef, useState } from 'react';
 import { hero } from '../config';
+
 const clip = hero.seated;
-let cache: HTMLImageElement[] | null = null;
-let inflight: Promise<HTMLImageElement[]> | null = null;
-async function loadFrames(): Promise<HTMLImageElement[]> {
-  if (cache) return cache;
-  if (inflight) return inflight;
-  inflight = (async () => {
+let cachedFrames: HTMLImageElement[] | null = null;
+let loadingFrames: Promise<HTMLImageElement[]> | null = null;
+
+export function preloadFrames(): Promise<HTMLImageElement[]> {
+  if (cachedFrames) return Promise.resolve(cachedFrames);
+  if (loadingFrames) return loadingFrames;
+  loadingFrames = (async () => {
     const result = new Array<HTMLImageElement>(clip.count);
     let next = 0;
     async function worker() {
       while (next < clip.count) {
-        const i = next++;
-        const im = new Image();
+        const index = next++;
+        const image = new Image();
         await new Promise<void>((resolve, reject) => {
-          im.onload = () => resolve();
-          im.onerror = () => reject(new Error(`无法加载 ${clip.framePath(i)}`));
-          im.src = clip.framePath(i);
+          image.onload = () => resolve();
+          image.onerror = () => reject(new Error(`图片加载失败：${clip.framePath(index)}`));
+          image.src = clip.framePath(index);
         });
-        result[i] = im;
+        result[index] = image;
       }
     }
     await Promise.all(Array.from({ length: 6 }, worker));
-    await Promise.all(result.slice(0, 8).map(im => im.decode().catch(() => {})));
-    cache = result;
+    await Promise.all(result.slice(0, 8).map(image => image.decode().catch(() => {})));
+    cachedFrames = result;
     return result;
   })();
-  try { return await inflight; } finally { inflight = null; }
+  return loadingFrames.finally(() => { loadingFrames = null; });
 }
-export default function FrameSequence() {
+
+export default function FrameSequence({ active }: { active: boolean }) {
   const [index, setIndex] = useState(0);
-  const [state, setState] = useState<'idle'|'loading'|'playing'|'ended'|'error'>('idle');
   const [error, setError] = useState('');
-  const raf = useRef(0), runId = useRef(0);
-  useEffect(() => () => { runId.current++; cancelAnimationFrame(raf.current); }, []);
-  async function play() {
-    if (state === 'loading' || state === 'playing') return;
+  const raf = useRef(0);
+  const runId = useRef(0);
+
+  useEffect(() => {
+    if (!active) return;
     const run = ++runId.current;
-    setState('loading');
-    try {
-      const frames = await loadFrames();
+    let start = 0;
+    let shown = 0;
+    void preloadFrames().then(frames => {
       if (run !== runId.current) return;
-      setIndex(0); setState('playing');
-      const start = performance.now(); let shown = 0;
+      start = performance.now();
       function tick(now: number) {
         if (run !== runId.current) return;
-        const i = Math.min(clip.count-1, Math.floor((now-start)*clip.fps/1000));
-        if (i !== shown) { shown = i; setIndex(i); frames[Math.min(i+3,clip.count-1)].decode().catch(() => {}); }
-        if (i < clip.count-1) raf.current = requestAnimationFrame(tick);
-        else setState('ended');
+        const next = Math.min(clip.count - 1, Math.floor((now - start) * clip.fps / 1000));
+        if (next !== shown) {
+          shown = next;
+          setIndex(next);
+          frames[Math.min(next + 3, clip.count - 1)].decode().catch(() => {});
+        }
+        if (next < clip.count - 1) raf.current = requestAnimationFrame(tick);
       }
       raf.current = requestAnimationFrame(tick);
-    } catch (e) {
-      if (run !== runId.current) return;
-      setError(e instanceof Error ? e.message : '素材加载失败'); setState('error');
-    }
-  }
-  const message = { idle:'点击左侧人物播放站起动作',loading:'正在加载动作图片…',playing:'正在播放',ended:'动作结束 · 点击可重播',error }[state];
-  return <>
-    <img className="figure figure-seated" src={clip.framePath(index)} alt={clip.label} width="628" height="586" />
-    <button className="figure-hit" onClick={play} disabled={state==='loading'} aria-label="播放左侧女性站起的逐帧动作" />
-    <div className="play-controls"><button onClick={play} disabled={state==='loading'||state==='playing'}>播放左侧人物动作</button><span role="status">{message}</span><small>52 张 WebP · 12 帧/秒 · 点击后加载</small></div>
-  </>;
+    }).catch(caught => setError(caught instanceof Error ? caught.message : '动作帧加载失败'));
+    return () => { runId.current++; cancelAnimationFrame(raf.current); };
+  }, [active]);
+
+  return <svg className="figure-sequence" viewBox={`0 0 ${hero.width} ${hero.height}`} preserveAspectRatio="xMidYMid slice" aria-label={clip.label} role="img">
+    <image href={clip.framePath(index)} x="0" y="270" width="628" height="586" preserveAspectRatio="none" />
+    {error && <title>{error}</title>}
+  </svg>;
 }

@@ -3,90 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SIX · 更新后的逐帧预览</title>
+<title>SIX · 全屏交互预览</title>
 <style>
-:root{color-scheme:light}
-*{box-sizing:border-box}
-body{margin:0;background:#eee4d4;color:#241826;font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
-main{width:min(100vw,1676px);margin:0 auto}
-.scene{position:relative;width:100%;aspect-ratio:1676/939;overflow:hidden;isolation:isolate;background:#f3e6d4}
-.scene img{position:absolute;display:block;user-select:none;pointer-events:none}
-.bg,.others{inset:0;width:100%;height:100%}
-.others,.seated{mix-blend-mode:multiply}
-.seated{left:0;top:28.754%;width:37.47%;height:62.407%}
-.headline{position:absolute;left:7%;top:17%;max-width:45%;color:#f8ead3;pointer-events:none}
-.headline small{font-size:clamp(10px,1.25vw,20px);letter-spacing:.3em}
-.headline h1{font-family:Georgia,"Songti SC",serif;font-size:clamp(28px,4.2vw,74px);font-weight:400;line-height:1.14;margin:1.2rem 0}
-.hit{position:absolute;left:18%;top:35%;width:22%;height:57%;border:0;background:transparent;cursor:pointer;font-size:0}
-.hit:focus-visible{outline:3px solid #fff;outline-offset:-4px}
-.bar{display:flex;align-items:center;gap:14px;padding:14px 18px;min-height:66px;background:#f4e8d8}
-button.play{appearance:none;background:#4e1a41;color:white;border:0;border-radius:999px;padding:10px 18px;font:inherit;cursor:pointer}
-button.play:disabled{opacity:.55;cursor:wait}
-#status{font-size:14px;color:#574b52}
-.info{margin-left:auto;font-size:13px;color:#746970}
-@media(max-width:650px){.headline{top:8%;left:5%}.headline h1{margin:.4rem 0}.info{display:none}.bar{padding:10px}.hit{left:14%;width:29%;top:28%;height:66%}}
+:root{font-family:system-ui,-apple-system,"PingFang SC",sans-serif;color:#f8ead3;background:#4e1a41;font-synthesis:none}*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden}.scene{position:relative;width:100vw;height:100vh;height:100svh;overflow:hidden;isolation:isolate;background:#4e1a41}.scene>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;user-select:none;pointer-events:none}.background{z-index:0}.figure{z-index:1;mix-blend-mode:multiply}.sequence{position:absolute;inset:0;width:100%;height:100%;z-index:4;mix-blend-mode:multiply;pointer-events:none}.pink-wave{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}.headline{position:absolute;z-index:2;left:7%;top:19%;width:min(45vw,720px);color:#f8ead3;transition:opacity .25s;pointer-events:none}.headline small{font-size:clamp(11px,1.15vw,20px);letter-spacing:.18em}.headline h1{font-family:Georgia,"Songti SC",serif;font-size:clamp(36px,5vw,84px);font-weight:400;line-height:1.2;margin:1.15em 0 .55em}.headline p{font-family:"Songti SC",serif;font-size:clamp(14px,1.55vw,25px);line-height:1.8;margin:0 0 1.5em}.learn-more{pointer-events:auto;border:1px solid #f8ead3;border-radius:99px;background:transparent;color:#f8ead3;padding:12px 25px;font:inherit;cursor:pointer}.headline-exiting{opacity:0}.hit{position:absolute;z-index:5;left:0;top:28.75%;width:37.5%;height:62.5%;border:0;background:transparent;cursor:pointer}.hit:focus-visible{outline:2px dashed white;outline-offset:-4px}.note{position:absolute;z-index:6;left:50%;bottom:3vh;transform:translateX(-50%);padding:9px 16px;border-radius:99px;background:#fff;color:#473541;font-size:14px;white-space:nowrap}
 </style>
 </head>
 <body>
-<main>
-<section class="scene" aria-label="三位女性的拼贴场景">
-  <img class="bg" src="../public/media/background.webp" width="1676" height="939" alt="">
-  <img class="others" src="../public/media/leaning.webp" width="1676" height="939" alt=""><img class="others" src="../public/media/walker.webp" width="1676" height="939" alt="">
-  <img id="seated" class="seated" src="../public/media/seated/frame_000.webp" width="628" height="586" alt="坐着的女性">
-  <div class="headline"><small>SIX · 一场价值投资实验</small><h1>与年轻的创业家<br>一起冒险</h1></div>
-  <button class="hit" id="person" type="button" aria-label="播放左侧女性站起的逐帧动作">播放动作</button>
-</section>
-<div class="bar">
-  <button class="play" id="play" type="button">播放左侧人物动作</button>
-  <span id="status" role="status">点击左侧人物或按钮播放</span>
-  <span class="info">52 张 WebP · 12 帧/秒 · 点击后加载</span>
-</div>
+<main class="scene" aria-label="SIX 官网首页主视觉">
+<img class="background" src="../public/media/background.webp" width="1676" height="939" alt="">
+<img class="figure" src="../public/media/leaning.webp" width="1676" height="939" alt="">
+<img class="figure" src="../public/media/walker.webp" width="1676" height="939" alt="">
+<div class="headline" id="headline"><small>SIX&nbsp;&nbsp; — &nbsp;&nbsp;一场价值投资实验</small><h1>与年轻的创业家<br>一起冒险</h1><p>有想象力、有活力、有胆识的新一代创业者，<br>和她们的新冒险。</p><button class="learn-more" id="learn" type="button">了解我们　→</button></div>
+<svg class="pink-wave" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><clipPath id="waveClip" clipPathUnits="userSpaceOnUse"><path id="wavePath" d="M 0 17 C 10 28, 30 52, 47 72 S 76 94, 91 100 L 0 100 Z"/></clipPath><pattern id="pinkPaper" width="12" height="12" patternUnits="userSpaceOnUse"><image href="../public/media/pink-texture.webp" width="12" height="12" preserveAspectRatio="none"/></pattern></defs><g clip-path="url(#waveClip)"><rect width="100" height="100" fill="#f23a64"/><rect width="100" height="100" fill="url(#pinkPaper)" opacity=".2"/></g></svg>
+<svg class="sequence" viewBox="0 0 1676 939" preserveAspectRatio="xMidYMid slice" aria-label="坐着的女性动作" role="img"><image id="frame" href="../public/media/seated/frame_000.webp" x="0" y="270" width="628" height="586" preserveAspectRatio="none"/></svg>
+<button class="hit" id="hit" aria-label="点击左侧坐姿女性，播放她站起并推进粉色浪潮"></button><div class="note" id="note" hidden></div>
 </main>
 <script>
-const count=52,fps=12;
-const image=document.getElementById('seated');
-const button=document.getElementById('play');
-const hit=document.getElementById('person');
-const status=document.getElementById('status');
-let frames=null,loading=null,playing=false,raf=0;
-const path=i=>`../public/media/seated/frame_${String(i).padStart(3,'0')}.webp`;
-async function loadFrames(){
-  if(frames)return frames;
-  if(loading)return loading;
-  button.disabled=true;status.textContent='正在加载动作图片…';
-  loading=(async()=>{
-    const result=Array(count);
-    let next=0;
-    async function worker(){
-      while(next<count){
-        const i=next++;
-        const item=new Image();
-        await new Promise((resolve,reject)=>{item.onload=resolve;item.onerror=()=>reject(new Error(path(i)));item.src=path(i)});
-        result[i]=item;
-      }
-    }
-    await Promise.all(Array.from({length:6},worker));
-    await Promise.all(result.slice(0,8).map(item=>item.decode?.().catch(()=>{})??Promise.resolve()));
-    frames=result;return result;
-  })();
-  try{return await loading}finally{loading=null;button.disabled=false}
-}
-async function play(){
-  if(playing)return;
-  try{await loadFrames()}catch(err){status.textContent=`加载失败：${err.message}`;return}
-  cancelAnimationFrame(raf);playing=true;status.textContent='正在播放';
-  image.src=frames[0].src;
-  const started=performance.now();let shown=0;
-  function tick(now){
-    if(!playing)return;
-    const index=Math.min(count-1,Math.floor((now-started)*fps/1000));
-    if(index!==shown){shown=index;image.src=frames[index].src;frames[Math.min(index+3,count-1)]?.decode?.().catch(()=>{})}
-    if(index<count-1){raf=requestAnimationFrame(tick)}
-    else{playing=false;status.textContent='动作结束 · 点击可重播'}
-  }
-  raf=requestAnimationFrame(tick);
-}
-button.addEventListener('click',play);hit.addEventListener('click',play);
+const count=52,fps=12,duration=4300;const frame=document.getElementById('frame'),pathNode=document.getElementById('wavePath'),headline=document.getElementById('headline'),hit=document.getElementById('hit'),note=document.getElementById('note');let frames=null,loading=null,started=false;
+const pathFor=p=>{const shift=p*110,rise=p*130,startY=17-rise;return `M 0 ${startY} C ${10+shift} ${28-rise}, ${30+shift} ${52-rise}, ${47+shift} ${72-rise} S ${76+shift} ${94-rise}, ${91+shift} ${100-rise} L 0 100 Z`};
+async function preload(){if(frames)return frames;if(loading)return loading;loading=(async()=>{const result=Array(count);let next=0;async function worker(){while(next<count){const i=next++,img=new Image(),src=`../public/media/seated/frame_${String(i).padStart(3,'0')}.webp`;await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error(`图片加载失败：${src}`));img.src=src});result[i]=img}}await Promise.all(Array.from({length:6},worker));await Promise.all(result.slice(0,8).map(img=>img.decode().catch(()=>{})));frames=result;return result})().finally(()=>{loading=null});return loading}
+async function play(){if(started)return;note.hidden=false;note.textContent='准备动作…';hit.disabled=true;try{await preload()}catch(err){note.textContent=err.message;hit.disabled=false;return}started=true;headline.classList.add('headline-exiting');note.hidden=true;const begin=performance.now();let last=-1;function tick(now){const elapsed=Math.min(1,(now-begin)/duration),index=Math.min(count-1,Math.floor((now-begin)*fps/1000));pathNode.setAttribute('d',pathFor(elapsed));if(index!==last){frame.setAttribute('href',frames[index].src);last=index;frames[Math.min(index+3,count-1)]?.decode().catch(()=>{})}if(elapsed<1)requestAnimationFrame(tick)}requestAnimationFrame(tick)}
+hit.addEventListener('pointerenter',()=>{void preload().catch(()=>{})});hit.addEventListener('focus',()=>{void preload().catch(()=>{})});hit.addEventListener('click',play);document.getElementById('learn').addEventListener('click',play);
 </script>
 </body>
 </html>
