@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Build the local seated-to-standing image sequence from a user-supplied video.
 
-Requires ffmpeg and Pillow. Original video and generated media stay local.
+Requires ffmpeg, Pillow, and OpenCV. Original video and generated media stay local.
 """
 import argparse
 import subprocess
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from PIL import Image, ImageStat, ImageDraw, ImageFilter
+from PIL import Image, ImageStat
 
 SOURCE_FPS = 24
 OUTPUT_FPS = 12
@@ -20,47 +20,20 @@ def sample_indices(frame_count: int):
     return list(range(0, frame_count, SOURCE_STEP))
 
 
-def connect_floor_shadow(canvas: Image.Image):
-    """Bridge only the visible floor gap between the cast shadow and the feet."""
-    pixels = canvas.load()
-    # The rightmost dark pixels along the floor belong to the contacting foot.
-    foot_x = max((x for y in range(566, 585) for x in range(285, CANVAS[0])
-                  if pixels[x, y] < 155), default=None)
-    if foot_x is None:
-        return
+def remove_watermark(source: Image.Image) -> Image.Image:
+    """Inpaint the fixed lower-right generator mark without painting over the foot."""
+    import cv2
+    import numpy as np
 
-    # Search left of the ankle/foot so body pixels cannot become the bridge start.
-    shadow_points = [(x, y) for y in range(565, 585)
-                     for x in range(20, max(21, foot_x - 92)) if pixels[x, y] < 145]
-    if not shadow_points:
-        return
-    start_x = max(x for x, _ in shadow_points)
-    if foot_x - start_x < 10:
-        return
-    near_tip = [(x, y) for x, y in shadow_points if x >= start_x - 8]
-    start_y = round(sum(y for _, y in near_tip) / len(near_tip))
-    foot_rows = [y for y in range(566, 585)
-                 for x in range(max(285, foot_x - 18), foot_x + 1) if pixels[x, y] < 155]
-    end_x = foot_x - 2
-    end_y = min(584, max(566, round(sum(foot_rows) / max(1, len(foot_rows)))))
-
-    # A gently rising, tapered ribbon reads as a floor shadow and avoids a ruler-straight bar.
-    length = end_x - start_x
-    if length <= 0:
-        return
-    mid_x = start_x + length * 0.58
-    mid_y = start_y + (end_y - start_y) * 0.55 - min(3, length * 0.025)
-    half_start = 1
-    half_mid = min(6, max(3, length * 0.055))
-    half_end = 2
-    polygon = [(start_x, start_y - half_start), (mid_x, mid_y - half_mid),
-               (end_x, end_y - half_end), (end_x, end_y + half_end),
-               (mid_x, mid_y + half_mid), (start_x, start_y + half_start)]
-    layer = Image.new('L', CANVAS, 0)
-    ImageDraw.Draw(layer).polygon(polygon, fill=255)
-    layer = layer.filter(ImageFilter.GaussianBlur(1.25))
-    grain = Image.effect_noise(CANVAS, 34).point(lambda value: max(68, min(108, round(88 + (value - 128) * 0.32))))
-    canvas.paste(grain, (0, 0), layer)
+    mask_path = Path(__file__).parent / 'assets' / 'kling_watermark_mask.png'
+    mask = cv2.imread(str(mask_path), cv2.IMREAD_GRAYSCALE)
+    if mask is None:
+        raise FileNotFoundError(f'Watermark mask not found: {mask_path}')
+    width, height = source.size
+    if mask.shape != (height, width):
+        mask = cv2.resize(mask, (width, height), interpolation=cv2.INTER_NEAREST)
+    restored = cv2.inpaint(np.asarray(source), mask, 4, cv2.INPAINT_TELEA)
+    return Image.fromarray(restored)
 
 
 def build(frames_dir: Path, output: Path):
@@ -72,7 +45,7 @@ def build(frames_dir: Path, output: Path):
     for stale in output.glob('frame_*.webp'):
         stale.unlink()
     for out_index, source_index in enumerate(indices):
-        source = Image.open(frames[source_index]).convert('L')
+        source = remove_watermark(Image.open(frames[source_index]).convert('L'))
         width, height = source.size
         neutral_crop = (round(width * 0.80), 0, round(width * 0.98), min(80, height))
         neutral = float(ImageStat.Stat(source.crop(neutral_crop)).median[0])
@@ -83,9 +56,8 @@ def build(frames_dir: Path, output: Path):
         tile = ink.resize((round(width * scale / 2), round(height * scale / 2)), Image.Resampling.LANCZOS)
         canvas = Image.new('L', CANVAS, 255)
         x = round((700 - 700 * scale) / 2 - 150)
-        y = round((1130 - 660 * scale) / 2)
+        y = round((1130 - 660 * scale) / 2) - 14  # keep the complete shoe inside the frame
         canvas.paste(tile, (x, y))
-        connect_floor_shadow(canvas)
         canvas.save(output / f'frame_{out_index:03d}.webp', format='WEBP', quality=78, method=5)
     return FIXED_SCALE, len(indices)
 
@@ -94,7 +66,7 @@ def main():
     parser = argparse.ArgumentParser()
     inputs = parser.add_mutually_exclusive_group(required=True)
     inputs.add_argument('--video', type=Path, help='User-supplied 24 fps video')
-    inputs.add_argument('--frames-dir', type=Path, help='Already extracted 121 PNG source frames')
+    inputs.add_argument('--frames-dir', type=Path, help='Already extracted 24 fps PNG source frames')
     parser.add_argument('--output', type=Path, default=Path('public/media/seated'))
     args = parser.parse_args()
     if args.frames_dir:
