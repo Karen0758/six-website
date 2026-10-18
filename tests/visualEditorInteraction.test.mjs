@@ -15,13 +15,17 @@ test('visual editor exposes accessible controls for layers, text, reset, and exp
       open: true,
       config: DEFAULT_EDITOR_CONFIG,
       onChange() {}, onReset() {}, onExport() {}, onToggle() {},
+      dragStyles: Object.fromEntries(Object.keys(DEFAULT_EDITOR_CONFIG.layers).map(id => [id, {}])),
     }));
-    for (const label of ['图层', '横向位置', '纵向位置', '缩放', '层级', '品牌副标题', '主标题', '介绍段落', '按钮文字', '恢复默认', '导出 JSON', '拖动左侧人物调整位置']) {
+    for (const label of ['图层', '横向位置', '纵向位置', '缩放', '横向拉伸', '纵向拉伸', '层级', '品牌名（最大标题）', '中文标题', '介绍段落', '按钮文字', '恢复默认', '导出 JSON', '拖动选中图层调整位置']) {
       assert.ok(html.includes(label), `missing editor control: ${label}`);
     }
     assert.match(html, /aria-label="横向位置"/);
     assert.match(html, /aria-label="纵向位置"/);
     assert.match(html, /aria-label="缩放"/);
+    assert.match(html, /aria-label="横向拉伸"/);
+    assert.match(html, /aria-label="纵向拉伸"/);
+    assert.match(html, /aria-label="拖动选中图层调整位置"/);
   } finally {
     await vite.close();
   }

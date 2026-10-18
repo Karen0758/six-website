@@ -7,7 +7,7 @@ import argparse
 import subprocess
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from PIL import Image, ImageStat
+from PIL import Image, ImageFilter, ImageStat
 
 SOURCE_FPS = 24
 OUTPUT_FPS = 12
@@ -36,7 +36,7 @@ def remove_watermark(source: Image.Image) -> Image.Image:
     return Image.fromarray(restored)
 
 
-def build(frames_dir: Path, output: Path):
+def build(frames_dir: Path, output: Path, clean_source: bool = False):
     output.mkdir(parents=True, exist_ok=True)
     frames = sorted(frames_dir.glob('frame_*.png'))
     if not frames:
@@ -45,7 +45,9 @@ def build(frames_dir: Path, output: Path):
     for stale in output.glob('frame_*.webp'):
         stale.unlink()
     for out_index, source_index in enumerate(indices):
-        source = remove_watermark(Image.open(frames[source_index]).convert('L'))
+        source = Image.open(frames[source_index]).convert('L')
+        if not clean_source:
+            source = remove_watermark(source)
         width, height = source.size
         neutral_crop = (round(width * 0.80), 0, round(width * 0.98), min(80, height))
         neutral = float(ImageStat.Stat(source.crop(neutral_crop)).median[0])
@@ -58,7 +60,10 @@ def build(frames_dir: Path, output: Path):
         x = round((700 - 700 * scale) / 2 - 150)
         y = round((1130 - 660 * scale) / 2) - 14  # keep the complete shoe inside the frame
         canvas.paste(tile, (x, y))
-        canvas.save(output / f'frame_{out_index:03d}.webp', format='WEBP', quality=78, method=5)
+        # Preserve fabric and hair detail at the browser's display size. The old
+        # quality=78 export was noticeably softer than the other homepage figures.
+        canvas = canvas.filter(ImageFilter.UnsharpMask(radius=1.0, percent=75, threshold=3))
+        canvas.save(output / f'frame_{out_index:03d}.webp', format='WEBP', quality=92, method=6)
     return FIXED_SCALE, len(indices)
 
 
@@ -68,16 +73,17 @@ def main():
     inputs.add_argument('--video', type=Path, help='User-supplied 24 fps video')
     inputs.add_argument('--frames-dir', type=Path, help='Already extracted 24 fps PNG source frames')
     parser.add_argument('--output', type=Path, default=Path('public/media/seated'))
+    parser.add_argument('--clean-source', action='store_true', help='Skip watermark inpainting for a clean source video')
     args = parser.parse_args()
     if args.frames_dir:
-        scale, count = build(args.frames_dir, args.output)
+        scale, count = build(args.frames_dir, args.output, args.clean_source)
     else:
         with TemporaryDirectory() as temp:
             folder = Path(temp)
             subprocess.run(['ffmpeg', '-v', 'error', '-i', str(args.video), '-map', '0:v:0',
                             '-fps_mode', 'passthrough', '-start_number', '0',
                             str(folder / 'frame_%04d.png')], check=True)
-            scale, count = build(folder, args.output)
+            scale, count = build(folder, args.output, args.clean_source)
     size = sum(p.stat().st_size for p in args.output.glob('frame_*.webp'))
     print(f'frames={count} fps={OUTPUT_FPS} duration={count/OUTPUT_FPS:.2f}s '
           f'fixed_scale={scale:.2f} bytes={size}')

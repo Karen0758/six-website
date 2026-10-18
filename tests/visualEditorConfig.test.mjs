@@ -11,6 +11,7 @@ import {
   resolveEditorConfig,
   saveEditorConfig,
 } from '../src/visualEditorConfig.ts';
+import * as editorConfig from '../src/visualEditorConfig.ts';
 
 function memoryStorage(initial = null) {
   let value = initial;
@@ -26,7 +27,15 @@ test('defaults define editable layers and homepage text', () => {
   assert.deepEqual(Object.keys(DEFAULT_EDITOR_CONFIG.layers), [
     'background', 'leftFigure', 'centerFigure', 'rightFigure', 'pinkReveal', 'headline',
   ]);
-  assert.equal(DEFAULT_EDITOR_CONFIG.layers.leftFigure.scale, 1.15);
+  assert.equal(DEFAULT_EDITOR_CONFIG.layers.leftFigure.scale, 1.53);
+  assert.deepEqual(DEFAULT_EDITOR_CONFIG.layers, {
+    background: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 0 },
+    leftFigure: { x: -84.31307952924395, y: 87.66923564189189, scale: 1.53, scaleX: 1, scaleY: 1, zIndex: 5 },
+    centerFigure: { x: -13, y: 46, scale: 1, scaleX: 1, scaleY: 1, zIndex: 3 },
+    rightFigure: { x: 0, y: -197, scale: 1, scaleX: 1, scaleY: 1, zIndex: 1 },
+    pinkReveal: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 2 },
+    headline: { x: -73, y: -130, scale: 0.91, scaleX: 1, scaleY: 1, zIndex: 4 },
+  });
   assert.deepEqual(Object.keys(DEFAULT_EDITOR_CONFIG.text), ['eyebrow', 'title', 'description', 'button']);
 });
 
@@ -35,25 +44,39 @@ test('resolveEditorConfig merges overrides without mutating defaults', () => {
     layers: { leftFigure: { x: 40 } }, text: { title: '自定义标题' },
   });
   assert.equal(resolved.layers.leftFigure.x, 40);
-  assert.equal(resolved.layers.leftFigure.scale, 1.15);
+  assert.equal(resolved.layers.leftFigure.scale, 1.53);
+  assert.equal(resolved.layers.leftFigure.scaleX, 1);
+  assert.equal(resolved.layers.leftFigure.scaleY, 1);
   assert.equal(resolved.text.title, '自定义标题');
   assert.notEqual(DEFAULT_EDITOR_CONFIG.layers.leftFigure.x, 40);
 });
 
 test('clampLayerTransform bounds coordinates, scale, and order', () => {
-  assert.deepEqual(clampLayerTransform({ x: 4000, y: -1200, scale: 9, zIndex: 123.4 }), {
-    x: 1676, y: -939, scale: 3, zIndex: 99,
+  assert.deepEqual(clampLayerTransform({ x: 4000, y: -1200, scale: 9, scaleX: 4, scaleY: 0.1, zIndex: 123.4 }), {
+    x: 1676, y: -939, scale: 3, scaleX: 3, scaleY: 0.25, zIndex: 99,
   });
   assert.deepEqual(clampLayerTransform({ x: NaN, y: Infinity, scale: 0, zIndex: -4 }), {
-    x: 0, y: 0, scale: 0.25, zIndex: 0,
+    x: 0, y: 0, scale: 0.25, scaleX: 1, scaleY: 1, zIndex: 0,
   });
+});
+
+test('legacy editor settings remain proportional and selected layers can be dragged responsively', () => {
+  const legacy = loadEditorConfig(memoryStorage(JSON.stringify({ layers: { leftFigure: { x: 12, y: 20, scale: 1.5 } } })));
+  assert.equal(legacy.layers.leftFigure.scaleX, 1);
+  assert.equal(legacy.layers.leftFigure.scaleY, 1);
+  assert.equal(editorConfig.dragLayerTransform(legacy.layers.leftFigure, 50, -25, 838, 469).x, 112);
+  assert.ok(Math.abs(editorConfig.dragLayerTransform(legacy.layers.leftFigure, 50, -25, 838, 469).y + 30) < 0.1);
+});
+
+test('layer styles apply independent horizontal and vertical stretching', () => {
+  assert.equal(editorConfig.layerStyle({ x: 0, y: 0, scale: 1.5, scaleX: 1.2, scaleY: 0.8, zIndex: 0 }).transform, 'translate(0vw, 0vh) scale(1.8, 1.2)');
 });
 
 test('loadEditorConfig falls back safely for malformed and invalid storage', () => {
   assert.deepEqual(loadEditorConfig(memoryStorage('{broken')), DEFAULT_EDITOR_CONFIG);
   const invalid = JSON.stringify({ layers: { leftFigure: { scale: 100 } }, text: { title: 42 } });
   const loaded = loadEditorConfig(memoryStorage(invalid));
-  assert.equal(loaded.layers.leftFigure.scale, 1.15);
+  assert.equal(loaded.layers.leftFigure.scale, 1.53);
   assert.equal(loaded.text.title, DEFAULT_EDITOR_CONFIG.text.title);
   assert.deepEqual(loadEditorConfig(null), DEFAULT_EDITOR_CONFIG);
   assert.deepEqual(loadEditorConfig({ getItem() { throw new Error('blocked'); } }), DEFAULT_EDITOR_CONFIG);

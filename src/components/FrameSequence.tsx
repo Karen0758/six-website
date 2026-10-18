@@ -1,11 +1,34 @@
 import { useEffect, useRef, useState } from 'react';
 import { hero } from '../config';
-import { yellowRevealRadius } from '../animationGeometry';
+import { interpolateBox, yellowRevealRadius } from '../animationGeometry';
 
-type Clip = typeof hero.seated | typeof hero.middle;
+type Clip = typeof hero.seated | typeof hero.middle | typeof hero.walkCycle;
 
 const cachedFrames = new Map<string, HTMLImageElement[]>();
 const loadingFrames = new Map<string, Promise<HTMLImageElement[]>>();
+const loadingStartFrames = new Map<string, Promise<void>>();
+
+function startFrameFor(clip: Clip): number {
+  return clip === hero.seated ? hero.seated.startFrame : 0;
+}
+
+export function preloadStartFrames(clip: Clip): Promise<void> {
+  const key = clip.framePath(0);
+  if (cachedFrames.has(key)) return Promise.resolve();
+  const loading = loadingStartFrames.get(key);
+  if (loading) return loading;
+  const start = startFrameFor(clip);
+  const promise = Promise.all(Array.from({ length: Math.min(6, clip.count - start) }, (_, offset) => {
+    const image = new Image();
+    return new Promise<void>((resolve, reject) => {
+      image.onload = () => { void image.decode().then(resolve, resolve); };
+      image.onerror = () => reject(new Error(`图片加载失败：${clip.framePath(start + offset)}`));
+      image.src = clip.framePath(start + offset);
+    });
+  })).then(() => {});
+  loadingStartFrames.set(key, promise);
+  return promise.finally(() => { loadingStartFrames.delete(key); });
+}
 
 export function preloadFrames(clip: Clip): Promise<HTMLImageElement[]> {
   const key = clip.framePath(0);
@@ -41,49 +64,58 @@ interface FrameSequenceProps {
   clip: Clip;
   active: boolean;
   revealProgress?: number;
+  revealOrigin?: { x: number; y: number };
+  translateX?: number;
+  onComplete?: () => void;
 }
 
-export default function FrameSequence({ clip, active, revealProgress }: FrameSequenceProps) {
+export default function FrameSequence({ clip, active, revealProgress, revealOrigin = { x: hero.width / 2, y: hero.height / 2 }, translateX = 0, onComplete }: FrameSequenceProps) {
   const [index, setIndex] = useState(0);
   const [error, setError] = useState('');
   const raf = useRef(0);
   const runId = useRef(0);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+  const firstFrame = startFrameFor(clip);
 
   useEffect(() => {
     if (!active) return;
     const run = ++runId.current;
     let start = 0;
-    let shown = 0;
-    setIndex(0);
+    let shown = firstFrame;
+    setIndex(firstFrame);
     setError('');
-    void preloadFrames(clip).then(frames => {
+    void preloadStartFrames(clip).then(() => {
       if (run !== runId.current) return;
       start = performance.now();
       function tick(now: number) {
         if (run !== runId.current) return;
-        const next = Math.min(clip.count - 1, Math.floor((now - start) * clip.fps / 1000));
+        const next = Math.min(clip.count - 1, firstFrame + Math.floor((now - start) * clip.fps / 1000));
         if (next !== shown) {
           shown = next;
           setIndex(next);
-          frames[Math.min(next + 3, clip.count - 1)].decode().catch(() => {});
         }
         if (next < clip.count - 1) raf.current = requestAnimationFrame(tick);
+        else onCompleteRef.current?.();
       }
       raf.current = requestAnimationFrame(tick);
     }).catch(caught => setError(caught instanceof Error ? caught.message : '动作帧加载失败'));
     return () => { runId.current++; cancelAnimationFrame(raf.current); };
-  }, [active, clip]);
+  }, [active, clip, firstFrame]);
 
-  const box = clip.box;
+  const sequenceProgress = active ? Math.max(0, index - firstFrame) / Math.max(clip.count - 1 - firstFrame, 1) : 0;
+  const box = clip === hero.seated && active && clip.activeBox
+    ? interpolateBox(clip.box, clip.activeBox, sequenceProgress)
+    : clip.box;
   const clipId = `frame-reveal-${clip.framePath(0).replace(/[^a-z0-9]/gi, '-')}`;
-  return <svg className={`figure-sequence ${clip === hero.middle ? 'figure-sequence-middle' : ''}`}
+  return <svg className={`figure-sequence ${clip === hero.middle ? 'figure-sequence-middle' : ''} ${clip === hero.walkCycle ? 'figure-sequence-walker' : ''}`}
     viewBox={`0 0 ${hero.width} ${hero.height}`} preserveAspectRatio="xMidYMid slice"
     aria-label={clip.label} role="img">
     {revealProgress !== undefined && <defs><clipPath id={clipId} clipPathUnits="userSpaceOnUse">
-      <circle cx={hero.width / 2} cy={hero.height / 2}
-        r={yellowRevealRadius(revealProgress, hero.width, hero.height)} />
+      <circle cx={revealOrigin.x} cy={revealOrigin.y}
+        r={yellowRevealRadius(revealProgress, hero.width, hero.height, revealOrigin.x, revealOrigin.y)} />
     </clipPath></defs>}
-    <g clipPath={revealProgress !== undefined ? `url(#${clipId})` : undefined}>
+    <g clipPath={revealProgress !== undefined ? `url(#${clipId})` : undefined} transform={`translate(${translateX} 0)`}>
       <image href={clip.framePath(index)} x={box.x} y={box.y} width={box.width} height={box.height} preserveAspectRatio="none" />
     </g>
     {error && <title>{error}</title>}
