@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { hero } from '../config';
 import { interpolateBox, yellowRevealRadius } from '../animationGeometry';
+import { mobileCanvas, mobileMiddleBox, mobileSeatedBox, mobileStandingBox, mobileWalkerBox } from '../mobileLayout';
 
 type Clip = typeof hero.seated | typeof hero.middle | typeof hero.walkCycle;
 
@@ -67,9 +68,10 @@ interface FrameSequenceProps {
   revealOrigin?: { x: number; y: number };
   translateX?: number;
   onComplete?: () => void;
+  mobile?: boolean;
 }
 
-export default function FrameSequence({ clip, active, revealProgress, revealOrigin = { x: hero.width / 2, y: hero.height / 2 }, translateX = 0, onComplete }: FrameSequenceProps) {
+export default function FrameSequence({ clip, active, revealProgress, revealOrigin = { x: hero.width / 2, y: hero.height / 2 }, translateX = 0, onComplete, mobile = false }: FrameSequenceProps) {
   const [index, setIndex] = useState(0);
   const [error, setError] = useState('');
   const raf = useRef(0);
@@ -104,16 +106,21 @@ export default function FrameSequence({ clip, active, revealProgress, revealOrig
   }, [active, clip, firstFrame]);
 
   const sequenceProgress = active ? Math.max(0, index - firstFrame) / Math.max(clip.count - 1 - firstFrame, 1) : 0;
-  const box = clip === hero.seated && active && clip.activeBox
-    ? interpolateBox(clip.box, clip.activeBox, sequenceProgress)
-    : clip.box;
+  const box = mobile
+    ? clip === hero.seated
+      ? active ? interpolateBox(mobileSeatedBox, mobileStandingBox, sequenceProgress) : mobileSeatedBox
+      : clip === hero.middle ? mobileMiddleBox : mobileWalkerBox
+    : clip === hero.seated && active && clip.activeBox
+      ? interpolateBox(clip.box, clip.activeBox, sequenceProgress)
+      : clip.box;
+  const canvas = mobile ? mobileCanvas : hero;
   const clipId = `frame-reveal-${clip.framePath(0).replace(/[^a-z0-9]/gi, '-')}`;
   return <svg className={`figure-sequence ${clip === hero.middle ? 'figure-sequence-middle' : ''} ${clip === hero.walkCycle ? 'figure-sequence-walker' : ''}`}
-    viewBox={`0 0 ${hero.width} ${hero.height}`} preserveAspectRatio="xMidYMid slice"
+    viewBox={`0 0 ${canvas.width} ${canvas.height}`} preserveAspectRatio={mobile ? 'xMidYMid meet' : 'xMidYMid slice'}
     aria-label={clip.label} role="img">
     {revealProgress !== undefined && <defs><clipPath id={clipId} clipPathUnits="userSpaceOnUse">
       <circle cx={revealOrigin.x} cy={revealOrigin.y}
-        r={yellowRevealRadius(revealProgress, hero.width, hero.height, revealOrigin.x, revealOrigin.y)} />
+        r={yellowRevealRadius(revealProgress, canvas.width, canvas.height, revealOrigin.x, revealOrigin.y)} />
     </clipPath></defs>}
     <g clipPath={revealProgress !== undefined ? `url(#${clipId})` : undefined} transform={`translate(${translateX} 0)`}>
       <image href={clip.framePath(index)} x={box.x} y={box.y} width={box.width} height={box.height} preserveAspectRatio="none" />

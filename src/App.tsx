@@ -2,11 +2,14 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { hero } from './config';
 import FrameSequence, { preloadFrames, preloadStartFrames } from './components/FrameSequence';
 import { beigeExitMotion as getBeigeExitMotion, pinkWavePath, thirdFigureMotion, yellowRevealRadius } from './animationGeometry';
-import { nextSceneForScroll } from './scrollSequence';
+import { nextSceneForScroll, previousSceneForScroll } from './scrollSequence';
 import { DEFAULT_EDITOR_CONFIG, exportEditorConfig, layerStyle, loadEditorConfig, resolveEditorConfig, resetEditorConfig as clearEditorConfig, saveEditorConfig, type EditorConfig, type LayerId } from './visualEditorConfig';
 import VisualEditor from './components/VisualEditor';
 import ChapterContent from './components/ChapterContent';
-import { isChapterContentReady, PINK_COVER_PROGRESS } from './chapterContentTiming';
+import { isChapterContentReady } from './chapterContentTiming';
+import { sceneForHomeEntry } from './homeNavigation';
+import { siteCopy } from './siteCopy';
+import { mobileCanvas, mobilePinkPath, mobileWalkerMotionWidth, mobileYellowBand, mobileYellowOrigin } from './mobileLayout';
 
 if (import.meta.env.DEV && typeof window !== 'undefined') void import('./editor.css');
 
@@ -16,8 +19,10 @@ const YELLOW_WIPE_MS = 1500;
 const BEIGE_TRANSITION_MS = 700;
 const BEIGE_WALK_ENTER_MS = 2500;
 const yellowRevealOrigin = { x: hero.width * 0.2, y: hero.height / 2 };
+const homePinkPath = 'M0 405 C185 490 415 585 594 674 C830 804 1260 887 1640 939 H0Z';
 
 export default function App({ initialConfig }: { initialConfig?: EditorConfig } = {}) {
+  const [mobile, setMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 700px)').matches);
   const [scene, setScene] = useState<Scene>('home');
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorConfig, setEditorConfig] = useState<EditorConfig>(() => import.meta.env.DEV
@@ -33,12 +38,20 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
   const startTime = useRef(0);
   const sceneRef = useRef<Scene>('home');
   const transitioningRef = useRef(false);
-  const queuedScrollAdvancesRef = useRef(0);
   const preloadCountRef = useRef(0);
 
   useEffect(() => () => cancelAnimationFrame(raf.current), []);
 
   useEffect(() => {
+    const query = window.matchMedia('(max-width: 700px)');
+    const update = () => setMobile(query.matches);
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    void preloadStartFrames(hero.seated).catch(() => {});
+    void preloadStartFrames(hero.middle).catch(() => {});
     const preloadTimer = window.setTimeout(() => {
       void preloadFrames(hero.seated).catch(() => {});
     }, 350);
@@ -77,11 +90,6 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
       }
       transitioningRef.current = false;
       if (sceneRef.current === 'beige') setBeigeExitComplete(true);
-      if (queuedScrollAdvancesRef.current > 0) {
-        queuedScrollAdvancesRef.current--;
-        const nextScene = nextSceneForScroll(sceneRef.current);
-        if (nextScene) void begin(nextScene);
-      }
     };
     raf.current = requestAnimationFrame(tick);
   }
@@ -125,13 +133,27 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
   }, [scene, beigeExitComplete]);
 
   function requestScrollAdvance() {
-    const nextScene = nextSceneForScroll(sceneRef.current, queuedScrollAdvancesRef.current);
+    if (transitioningRef.current) return;
+    const nextScene = nextSceneForScroll(sceneRef.current);
     if (!nextScene) return;
-    if (transitioningRef.current) {
-      queuedScrollAdvancesRef.current++;
-      return;
-    }
     void begin(nextScene);
+  }
+
+  function returnHome() {
+    if (transitioningRef.current) return;
+    sceneRef.current = 'home';
+    setScene('home');
+    setProgress(0);
+    setBeigeExitComplete(false);
+    setWalkEnterProgress(0);
+    setError('');
+  }
+
+  function requestScrollBack() {
+    if (transitioningRef.current) return;
+    const previousScene = previousSceneForScroll(sceneRef.current);
+    if (previousScene === 'home') returnHome();
+    else if (previousScene) void begin(previousScene);
   }
 
   useEffect(() => {
@@ -140,41 +162,51 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
     let wheelIdleTimer = 0;
     let touchStartY: number | null = null;
     let touchStartChapter: HTMLElement | null = null;
+    let touchStartScrollTop = 0;
 
     const onWheel = (event: WheelEvent) => {
-      if (event.deltaY <= 0 || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
-      if (!nextSceneForScroll(sceneRef.current, queuedScrollAdvancesRef.current)) return;
+      if (!event.deltaY || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
+      const direction = Math.sign(event.deltaY);
+      if (direction > 0 ? !nextSceneForScroll(sceneRef.current) : !previousSceneForScroll(sceneRef.current)) return;
       const chapter = event.target instanceof Element ? event.target.closest<HTMLElement>('.chapter-content') : null;
-      if (chapter && chapter.scrollTop + chapter.clientHeight < chapter.scrollHeight - 1) return;
+      if (chapter && (direction > 0
+        ? chapter.scrollTop + chapter.clientHeight < chapter.scrollHeight - 1
+        : chapter.scrollTop > 1)) return;
       event.preventDefault();
       window.clearTimeout(wheelIdleTimer);
-      if (!wheelGestureTriggered) {
-        accumulatedWheel += event.deltaY;
-        if (accumulatedWheel >= 55) {
+      if (!wheelGestureTriggered && !transitioningRef.current) {
+        accumulatedWheel = Math.sign(accumulatedWheel) === direction ? accumulatedWheel + event.deltaY : event.deltaY;
+        if (Math.abs(accumulatedWheel) >= 55) {
           wheelGestureTriggered = true;
-          requestScrollAdvance();
+          if (direction > 0) requestScrollAdvance();
+          else requestScrollBack();
         }
       }
       wheelIdleTimer = window.setTimeout(() => {
         accumulatedWheel = 0;
         wheelGestureTriggered = false;
-      }, 360);
+      }, 500);
     };
 
     const onTouchStart = (event: TouchEvent) => {
       touchStartY = event.touches.length === 1 ? event.touches[0].clientY : null;
       touchStartChapter = event.target instanceof Element ? event.target.closest<HTMLElement>('.chapter-content') : null;
+      touchStartScrollTop = touchStartChapter?.scrollTop ?? 0;
     };
     const onTouchEnd = (event: TouchEvent) => {
       if (touchStartY === null || event.changedTouches.length !== 1) return;
-      const swipeUpDistance = touchStartY - event.changedTouches[0].clientY;
+      const swipeDistance = touchStartY - event.changedTouches[0].clientY;
       touchStartY = null;
-      if (swipeUpDistance >= 70 && touchStartChapter && touchStartChapter.scrollTop + touchStartChapter.clientHeight < touchStartChapter.scrollHeight - 1) {
+      if (Math.abs(swipeDistance) < 70) return;
+      if (touchStartChapter && (swipeDistance > 0
+        ? touchStartScrollTop + touchStartChapter.clientHeight < touchStartChapter.scrollHeight - 1
+        : touchStartScrollTop > 1)) {
         touchStartChapter = null;
         return;
       }
       touchStartChapter = null;
-      if (swipeUpDistance >= 70) requestScrollAdvance();
+      if (swipeDistance > 0) requestScrollAdvance();
+      else requestScrollBack();
     };
 
     window.addEventListener('wheel', onWheel, { passive: false });
@@ -189,9 +221,14 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
   }, []);
 
   const pinkPath = pinkWavePath(progress);
-  const radius = yellowRevealRadius(progress, hero.width, hero.height, yellowRevealOrigin.x, yellowRevealOrigin.y);
-  const beigeExit = getBeigeExitMotion(progress, hero.width, hero.height);
-  const thirdEnterMotion = thirdFigureMotion(walkEnterProgress, hero.width, hero.walkCycle.motionWidth);
+  const canvas = mobile ? mobileCanvas : hero;
+  const scenePinkPath = mobile ? mobilePinkPath : homePinkPath;
+  const yellowBand = mobile ? mobileYellowBand : { x: 594, width: 236 };
+  const sceneYellowOrigin = mobile ? mobileYellowOrigin : yellowRevealOrigin;
+  const radius = yellowRevealRadius(progress, canvas.width, canvas.height, sceneYellowOrigin.x, sceneYellowOrigin.y);
+  const beigeExit = getBeigeExitMotion(progress, canvas.width, canvas.height);
+  const beigeYellowX = mobile ? -canvas.width * progress : beigeExit.yellowX;
+  const thirdEnterMotion = thirdFigureMotion(walkEnterProgress, canvas.width, mobile ? mobileWalkerMotionWidth : hero.walkCycle.motionWidth);
   const chapterAnimationDurationMs = scene === 'pink'
     ? (hero.seated.count - 1 - hero.seated.startFrame) / hero.seated.fps * 1000
     : scene === 'yellow'
@@ -200,6 +237,7 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
   const styleFor = (id: LayerId, origin?: string) => layerStyle(visual.layers[id], hero.width, hero.height, origin);
   const leftFigureStyle = styleFor('leftFigure', '24% 91.2%');
   const leftHitStyle = styleFor('leftFigure', '55% 101%');
+  const middleHitStyle = { ...styleFor('centerFigure'), zIndex: Math.max(leftHitStyle.zIndex + 1, visual.layers.centerFigure.zIndex) };
   const editorDragStyles: Record<LayerId, CSSProperties> = {
     background: { ...styleFor('background'), left: '0%', top: '0%', width: '100%', height: '100%', zIndex: 25 },
     leftFigure: { ...leftHitStyle, left: '15%', top: '50%', width: '14%', height: '45%', zIndex: 25 },
@@ -212,36 +250,45 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
   return <main className={`scene scene--${scene}`} aria-label="SIX 官网首页主视觉，可点击人物卡片或向下滚动依次体验三段动作">
     {scene === 'beige' && <>
       <img className="beige-background" src={hero.thirdBackground} width={hero.width} height={hero.height} alt="" />
-      <svg className="beige-transition-art" viewBox={`0 0 ${hero.width} ${hero.height}`} preserveAspectRatio="none" aria-hidden="true">
+      {!beigeExitComplete && <svg className="beige-transition-art" viewBox={`0 0 ${canvas.width} ${canvas.height}`} preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <clipPath id="beige-exit-pink-clip" clipPathUnits="userSpaceOnUse">
-            <path d="M0 163 C93 251 294 331 400 389 C520 466 677 634 779 700 C851 744 907 781 980 807 C1150 860 1330 884 1507 939 H0Z" />
+            <path d={scenePinkPath} />
           </clipPath>
-          <clipPath id="beige-exit-yellow-purple-clip" clipPathUnits="userSpaceOnUse">
-            <path d="M0 0H980V807 C907 781 851 744 779 700 C677 634 520 466 400 389 C294 331 93 251 0 163Z" />
+          <clipPath id="beige-exit-yellow-clip" clipPathUnits="userSpaceOnUse">
+            <rect x={yellowBand.x} y="0" width={yellowBand.width} height={canvas.height} />
           </clipPath>
         </defs>
         <g className="beige-exit-pink" transform={`translate(0 ${beigeExit.pinkY})`}>
-          <image href={hero.background} x="0" y="0" width={hero.width} height={hero.height} clipPath="url(#beige-exit-pink-clip)" />
+          <image href="./media/pink-paper-wide.webp" x="0" y="0" width={canvas.width} height={canvas.height} preserveAspectRatio={mobile ? 'xMidYMid slice' : 'none'} clipPath="url(#beige-exit-pink-clip)" />
         </g>
-        <g className="beige-exit-yellow-purple" transform={`translate(${beigeExit.yellowPurpleX} 0)`}>
-          <image href={hero.background} x="0" y="0" width={hero.width} height={hero.height} clipPath="url(#beige-exit-yellow-purple-clip)" />
+        <g className="beige-exit-yellow" transform={`translate(${beigeYellowX} 0)`}>
+          <image href={hero.yellowTexture} x="0" y="0" width={canvas.width} height={canvas.height} preserveAspectRatio={mobile ? 'xMidYMid slice' : 'none'} clipPath="url(#beige-exit-yellow-clip)" />
         </g>
-      </svg>
+      </svg>}
     </>}
-    {scene !== 'beige' && <img className="background home-exit-down" src={hero.background} width={hero.width} height={hero.height} alt="" fetchPriority="high" style={styleFor('background')} />}
+    {scene !== 'beige' && <svg className="home-background home-exit-down" viewBox={`0 0 ${canvas.width} ${canvas.height}`} preserveAspectRatio="none" aria-hidden="true" style={styleFor('background')}>
+      <defs>
+        <clipPath id="home-yellow-clip" clipPathUnits="userSpaceOnUse"><rect x={yellowBand.x} y="0" width={yellowBand.width} height={canvas.height} /></clipPath>
+        <clipPath id="home-pink-clip" clipPathUnits="userSpaceOnUse"><path d={scenePinkPath} /></clipPath>
+      </defs>
+      <image href={hero.thirdBackground} x="0" y="0" width={canvas.width} height={canvas.height} preserveAspectRatio={mobile ? 'xMidYMid slice' : 'none'} />
+      <image href={hero.yellowTexture} x="0" y="0" width={canvas.width} height={canvas.height} preserveAspectRatio={mobile ? 'xMidYMid slice' : 'none'} clipPath="url(#home-yellow-clip)" />
+      <image href="./media/pink-paper-wide.webp" x="0" y="0" width={canvas.width} height={canvas.height} preserveAspectRatio={mobile ? 'xMidYMid slice' : 'none'} clipPath="url(#home-pink-clip)" />
+    </svg>}
     <img className="figure figure-leaning home-exit-down" src={hero.leaning.image} width={hero.width} height={hero.height} alt={hero.leaning.label} style={styleFor('centerFigure')} />
-    {scene === 'home' && <img className="figure figure-walker" src={hero.walker.image} width={hero.width} height={hero.height} alt={hero.walker.label} style={styleFor('rightFigure')} />}
-    {scene === 'beige' && <img className="figure figure-walker home-exit-down" src={hero.walker.image} width={hero.width} height={hero.height} alt={hero.walker.label} style={styleFor('rightFigure')} />}
 
     <div className={`headline home-exit-down ${scene !== 'home' ? 'headline-exiting' : ''}`} style={styleFor('headline')}>
       <h1 className="brand-wordmark">{visual.text.eyebrow}</h1>
-      <h2 className="headline-title">{visual.text.title.split('\n').map((line, index) => <span key={`${line}-${index}`}>{index > 0 && <br />}{line}</span>)}</h2>
+      <h2 className="headline-title">{visual.text.title.split('\n').map((line, index) => <span key={`${line}-${index}`}>{line}</span>)}</h2>
       <p>{visual.text.description.split('\n').map((line, index) => <span key={`${line}-${index}`}>{index > 0 && <br />}{line}</span>)}</p>
-      <button className="learn-more" type="button" onClick={() => void begin('pink')} disabled={scene !== 'home' || loading}>{visual.text.button}</button>
+      <button className="learn-more" type="button"
+        onPointerEnter={() => { void preloadFrames(hero.walkCycle).catch(() => {}); }}
+        onFocus={() => { void preloadFrames(hero.walkCycle).catch(() => {}); }}
+        onClick={() => void begin(sceneForHomeEntry('joinCta'))} disabled={scene !== 'home' || loading}>{visual.text.button}</button>
     </div>
 
-    {scene !== 'beige' && <svg className="pink-wave home-exit-down" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" style={styleFor('pinkReveal')}>
+    {(scene === 'pink' || scene === 'yellow') && <svg className="pink-wave home-exit-down" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" style={styleFor('pinkReveal')}>
       <defs>
         <clipPath id="pink-wave-clip" clipPathUnits="userSpaceOnUse"><path d={pinkPath} /></clipPath>
       </defs>
@@ -251,59 +298,64 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
       </g>
     </svg>}
 
-    {scene === 'yellow' && <svg className="yellow-wave home-exit-down" viewBox={`0 0 ${hero.width} ${hero.height}`} preserveAspectRatio="none" aria-hidden="true">
+    {scene === 'yellow' && <svg className="yellow-wave home-exit-down" viewBox={`0 0 ${canvas.width} ${canvas.height}`} preserveAspectRatio={mobile ? 'xMidYMid slice' : 'none'} aria-hidden="true">
       <defs>
         <clipPath id="yellow-background-reveal" clipPathUnits="userSpaceOnUse">
-          <circle cx={yellowRevealOrigin.x} cy={yellowRevealOrigin.y} r={radius} />
+          <circle cx={sceneYellowOrigin.x} cy={sceneYellowOrigin.y} r={radius} />
         </clipPath>
-        <pattern id="yellow-paper" width={hero.width} height={hero.height} patternUnits="userSpaceOnUse">
-          <image href={hero.yellowTexture} width={hero.width} height={hero.height} preserveAspectRatio="none" />
+        <pattern id="yellow-paper" width={canvas.width} height={canvas.height} patternUnits="userSpaceOnUse">
+          <image href={hero.yellowTexture} width={canvas.width} height={canvas.height} preserveAspectRatio={mobile ? 'xMidYMid slice' : 'none'} />
         </pattern>
       </defs>
       <g clipPath="url(#yellow-background-reveal)">
-        <rect width={hero.width} height={hero.height} fill="#d9a534" />
-        <rect width={hero.width} height={hero.height} fill="url(#yellow-paper)" />
+        <rect width={canvas.width} height={canvas.height} fill="#d9a534" />
+        <rect width={canvas.width} height={canvas.height} fill="url(#yellow-paper)" />
       </g>
     </svg>}
 
-    {scene !== 'yellow' && <div className="sequence-editor-layer home-exit-down" style={leftFigureStyle}><FrameSequence clip={hero.seated} active={scene === 'pink' && progress >= PINK_COVER_PROGRESS} /></div>}
-    {scene === 'yellow' && <div className="sequence-editor-layer" style={styleFor('centerFigure')}><FrameSequence clip={hero.middle} active={scene === 'yellow' && progress >= 1} revealProgress={progress} revealOrigin={yellowRevealOrigin} /></div>}
+    {scene !== 'yellow' && <div className="sequence-editor-layer home-exit-down" style={leftFigureStyle}><FrameSequence clip={hero.seated} active={scene === 'pink'} mobile={mobile} /></div>}
+    {scene === 'yellow' && <div className="sequence-editor-layer" style={styleFor('centerFigure')}><FrameSequence clip={hero.middle} active={scene === 'yellow'} revealProgress={progress} revealOrigin={sceneYellowOrigin} mobile={mobile} /></div>}
     {scene === 'beige' && beigeExitComplete && <div className="third-walker-enter">
-      <FrameSequence clip={hero.walkCycle} active translateX={thirdEnterMotion.enterX} />
+      <FrameSequence clip={hero.walkCycle} active translateX={thirdEnterMotion.enterX} mobile={mobile} />
     </div>}
     {isChapterContentReady(scene, progress) && <ChapterContent scene={scene} animationDurationMs={chapterAnimationDurationMs} />}
+    {(scene === 'pink' || scene === 'yellow') && progress >= 1 && <button className="scroll-cue" type="button" onClick={requestScrollAdvance} aria-label="继续下滑或点击进入下一页">
+      <span>继续下滑</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v16m-6-6 6 6 6-6" /></svg>
+    </button>}
+    {scene === 'beige' && progress >= 1 && <button className="return-home" type="button" onClick={returnHome} aria-label="返回主页">
+      <span>返回主页</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12H4m6-6-6 6 6 6" /></svg>
+    </button>}
 
     {scene === 'home' && <>
+      <button className="figure-caption figure-caption-left" type="button"
+        onPointerEnter={() => { void preloadFrames(hero.seated).catch(() => {}); }}
+        onFocus={() => { void preloadFrames(hero.seated).catch(() => {}); }}
+        onClick={() => void begin(sceneForHomeEntry('firstFigure'))}
+        aria-label={`第一个人物：${siteCopy.about.title}`}>
+        <span className="figure-caption-number">01</span><span className="figure-caption-name">{siteCopy.about.title}</span><svg className="figure-caption-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5 M9 5h10v10" /></svg>
+      </button>
+      <button className="figure-caption figure-caption-middle" type="button"
+        onPointerEnter={() => { void preloadFrames(hero.middle).catch(() => {}); }}
+        onFocus={() => { void preloadFrames(hero.middle).catch(() => {}); }}
+        onClick={() => void begin(sceneForHomeEntry('middleFigure'))}
+        aria-label={`中间黄色人物：${siteCopy.work.title}`}>
+        <span className="figure-caption-number">02</span><span className="figure-caption-name">{siteCopy.work.title}</span><svg className="figure-caption-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5 5 19 M5 9v10h10" /></svg>
+      </button>
       <button className="figure-hit figure-hit-left" type="button"
         onPointerEnter={() => { void preloadFrames(hero.seated).catch(() => {}); }}
         onFocus={() => { void preloadFrames(hero.seated).catch(() => {}); }}
-        onClick={() => void begin('pink')}
-        aria-label="点击左侧人物卡片，粉色纸纹铺满屏幕并播放站起动作" style={leftHitStyle} />
+        onClick={() => void begin(sceneForHomeEntry('firstFigure'))}
+        aria-label="点击第一个人物，查看我们是谁并播放站起动作" style={leftHitStyle} />
       <button className="figure-hit figure-hit-middle" type="button"
         onPointerEnter={() => { void preloadFrames(hero.middle).catch(() => {}); }}
         onFocus={() => { void preloadFrames(hero.middle).catch(() => {}); }}
-        onClick={() => void begin('yellow')}
-        aria-label="点击黄色区域人物，黄色纸纹从中心铺满屏幕并播放转向镜头的动作" style={styleFor('centerFigure')} />
+        onClick={() => void begin(sceneForHomeEntry('middleFigure'))}
+        aria-label="点击中间黄色人物，查看方法并播放转向镜头的动作" style={middleHitStyle} />
       <button className="figure-hit figure-hit-right" type="button"
         onPointerEnter={() => { void preloadFrames(hero.walkCycle).catch(() => {}); }}
         onFocus={() => { void preloadFrames(hero.walkCycle).catch(() => {}); }}
-        onClick={() => void begin('beige')}
-        aria-label="点击右侧人物，黄紫色向左、粉色与人物向下退出，人物从左侧走入米色纸纹画面" style={styleFor('rightFigure')} />
-      <button className="chapter-label chapter-label-pink" type="button"
-        onPointerEnter={() => { void preloadFrames(hero.seated).catch(() => {}); }}
-        onFocus={() => { void preloadFrames(hero.seated).catch(() => {}); }}
-        onClick={() => void begin('pink')}
-        aria-label="我们是谁，粉色纸纹铺满屏幕并播放站起动作">我们是谁</button>
-      <button className="chapter-label chapter-label-yellow" type="button"
-        onPointerEnter={() => { void preloadFrames(hero.middle).catch(() => {}); }}
-        onFocus={() => { void preloadFrames(hero.middle).catch(() => {}); }}
-        onClick={() => void begin('yellow')}
-        aria-label="怎么工作，黄色纸纹从中心铺满屏幕并播放转向镜头的动作">怎么工作</button>
-      <button className="chapter-label chapter-label-beige" type="button"
-        onPointerEnter={() => { void preloadFrames(hero.walkCycle).catch(() => {}); }}
-        onFocus={() => { void preloadFrames(hero.walkCycle).catch(() => {}); }}
-        onClick={() => void begin('beige')}
-        aria-label="加入 SIX，黄紫色向左、粉色与人物向下退出，人物从左侧走入米色纸纹画面">加入 SIX</button>
+        onClick={() => void begin(sceneForHomeEntry('thirdRegion'))}
+        aria-label="点击米色区域，查看如何加入并播放第三个人物动画" style={styleFor('rightFigure')} />
     </>}
     {import.meta.env.DEV && <VisualEditor open={editorOpen} config={visual} onChange={updateEditorConfig} onReset={restoreEditorDefaults} onExport={downloadEditorConfig} onToggle={() => setEditorOpen(value => !value)} dragStyles={editorDragStyles} />}
     {loading && scene === 'home' && <div className="loading-note" role="status">准备动作…</div>}

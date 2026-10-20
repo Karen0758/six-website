@@ -35,7 +35,10 @@ export default function ChapterContent({ scene, animationDurationMs }: { scene: 
       <p className="chapter-reveal" style={{ animationDelay: `${delays[4]}ms` }}>{siteCopy.join.founder.paragraph}</p>
     </div>
     <div className="join-contact chapter-reveal" style={{ animationDelay: `${delays[5]}ms` }}>
-      <a href={`mailto:${siteCopy.join.email}`}>{siteCopy.join.email}</a>
+      <a href={`mailto:${siteCopy.join.email}`} aria-label={`发送邮件至 ${siteCopy.join.email}`}>
+        <svg className="join-email-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.5" /><path d="m4 7 8 6 8-6" /></svg>
+        <span className="join-email-action">发邮件</span>
+      </a>
     </div>
     <p className="chapter-reveal" style={{ animationDelay: `${delays[6]}ms` }}>{siteCopy.join.locations}</p>
   </section>;

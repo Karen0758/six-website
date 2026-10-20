@@ -8,3 +8,8 @@ export function nextSceneForScroll(scene: ScrollScene, queuedAdvances = 0): Excl
   const nextScene = SCENE_ORDER[nextIndex];
   return nextScene && nextScene !== 'home' ? nextScene : null;
 }
+
+export function previousSceneForScroll(scene: ScrollScene): ScrollScene | null {
+  const previousIndex = SCENE_ORDER.indexOf(scene) - 1;
+  return previousIndex >= 0 ? SCENE_ORDER[previousIndex] : null;
+}

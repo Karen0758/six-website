@@ -2,6 +2,8 @@ export type ChapterScene = 'home' | 'pink' | 'yellow' | 'beige';
 
 // The diagonal pink edge has already moved beyond every viewport corner here.
 export const PINK_COVER_PROGRESS = 0.65;
+// One second into the 1.5-second yellow reveal, leaving half a second before it ends.
+export const YELLOW_TEXT_START_PROGRESS = 2 / 3;
 
 export const CHAPTER_REVEAL_FADE_MS = 320;
 
@@ -20,5 +22,6 @@ export function staggeredRevealDelays(
 
 export function isChapterContentReady(scene: ChapterScene, transitionProgress: number): boolean {
   if (scene === 'pink') return transitionProgress >= PINK_COVER_PROGRESS;
+  if (scene === 'yellow') return transitionProgress >= YELLOW_TEXT_START_PROGRESS;
   return scene !== 'home' && transitionProgress >= 1;
 }

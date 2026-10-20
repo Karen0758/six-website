@@ -59,15 +59,15 @@ test('yellow reveal expands from the left-side figure and still reaches the fart
   assert.ok(radius >= farthestCorner);
 });
 
-test('beige transition sends yellow and purple left while pink and figures move down in parallel', () => {
+test('beige transition sends yellow left while pink and figures move down in parallel', () => {
   assert.equal(typeof geometry.beigeExitMotion, 'function');
-  assert.deepEqual(geometry.beigeExitMotion(0, 1676, 939), { yellowPurpleX: 0, pinkY: 0 });
+  assert.deepEqual(geometry.beigeExitMotion(0, 1676, 939), { yellowX: 0, pinkY: 0 });
   const halfway = geometry.beigeExitMotion(0.5, 1676, 939);
-  assert.ok(halfway.yellowPurpleX < 0);
+  assert.ok(halfway.yellowX < 0);
   assert.ok(halfway.pinkY > 0);
   const end = geometry.beigeExitMotion(1, 1676, 939);
-  assert.ok(end.yellowPurpleX <= -1676 * 0.6);
-  assert.ok(end.yellowPurpleX > -1676);
+  assert.ok(end.yellowX <= -1676 * 0.6);
+  assert.ok(end.yellowX > -1676);
   assert.ok(end.pinkY >= 939);
 });
 

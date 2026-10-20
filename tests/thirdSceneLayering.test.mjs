@@ -21,15 +21,15 @@ test('third-scene entrance and chapter copy start after the homepage exit, while
   assert.doesNotMatch(app, /chapterAnimationCompleteScene/);
 });
 
-test('beige scene moves yellow and purple left while pink and homepage figures move down', () => {
-  assert.match(app, /const beigeExit = getBeigeExitMotion\(progress, hero\.width, hero\.height\)/, 'left and downward exits share one transition progress');
-  assert.match(app, /scene === 'beige' && <>[\s\S]*?<svg className="beige-transition-art"/);
+test('beige scene moves yellow left while pink and homepage figures move down', () => {
+  assert.match(app, /const beigeExit = getBeigeExitMotion\(progress, canvas\.width, canvas\.height\)/, 'left and downward exits share one transition progress');
+  assert.match(app, /scene === 'beige' && <>[\s\S]*?!beigeExitComplete && <svg className="beige-transition-art"/);
   assert.match(app, /className="beige-exit-pink"[\s\S]*?translate\(0 \$\{beigeExit\.pinkY\}\)[\s\S]*?clipPath="url\(#beige-exit-pink-clip\)"/);
-  assert.match(app, /className="beige-exit-yellow-purple"[\s\S]*?translate\(\$\{beigeExit\.yellowPurpleX\} 0\)[\s\S]*?clipPath="url\(#beige-exit-yellow-purple-clip\)"/);
-  assert.match(app, /scene === 'beige' && <img className="figure figure-walker home-exit-down"/);
-  assert.doesNotMatch(app, /className="third-walker-exit"/, 'the original right-side figure should leave downward with the other homepage figures');
-  assert.match(app, /scene !== 'beige' && <img className="background home-exit-down"/);
-  assert.match(app, /scene !== 'beige' && <svg className="pink-wave home-exit-down"/);
+  assert.match(app, /className="beige-exit-yellow"[\s\S]*?translate\(\$\{beigeYellowX\} 0\)[\s\S]*?clipPath="url\(#beige-exit-yellow-clip\)"/);
+  assert.doesNotMatch(app, /className="figure figure-walker home-exit-down"/, 'the third figure stays off the homepage');
+  assert.match(app, /scene !== 'beige' && <svg className="home-background home-exit-down"/);
+  assert.match(app, /\(scene === 'pink' \|\| scene === 'yellow'\) && <svg className="pink-wave home-exit-down"/);
+  assert.doesNotMatch(app, /purple/i, 'purple artwork must not return in the beige transition');
   assert.match(styles, /\.beige-transition-art\s*\{[^}]*z-index:\s*0/s);
   assert.doesNotMatch(app, /scene === 'beige' && <svg className="yellow-wave/);
 });
@@ -54,8 +54,8 @@ test('yellow transition reveals a full-screen radial background above the pink w
   assert.match(sceneLayers[1], /transform:\s*none\s*!important/);
   assert.match(sceneLayers[2], /z-index:\s*3\s*!important/);
   assert.match(sceneLayers[2], /transform:\s*none\s*!important/);
-  assert.match(yellow, /cx=\{yellowRevealOrigin\.x\}/);
-  assert.match(yellow, /cy=\{yellowRevealOrigin\.y\}/);
+  assert.match(yellow, /cx=\{sceneYellowOrigin\.x\}/);
+  assert.match(yellow, /cy=\{sceneYellowOrigin\.y\}/);
   assert.match(app, /const yellowRevealOrigin = \{ x: hero\.width \* 0\.2, y: hero\.height \/ 2 \}/);
-  assert.match(config, /count: 20, fps: 12, box: \{ x: 165, y: 320, width: 364, height: 545 \}/);
+  assert.match(config, /count: 20, fps: 12, box: \{ x: 560, y: 320, width: 364, height: 545 \}/);
 });

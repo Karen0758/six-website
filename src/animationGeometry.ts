@@ -34,7 +34,7 @@ export function yellowRevealRadius(progress: number, width: number, height: numb
 
 export function beigeExitMotion(progress: number, width: number, height: number) {
   const p = Math.max(0, Math.min(1, progress));
-  return { yellowPurpleX: p === 0 ? 0 : -width * 0.62 * p, pinkY: height * 1.2 * p };
+  return { yellowX: p === 0 ? 0 : -width * 0.62 * p, pinkY: height * 1.2 * p };
 }
 
 export function thirdFigureMotion(progress: number, viewportWidth: number, figureWidth: number) {

@@ -29,3 +29,11 @@ test('queued scroll gestures advance after the current scene without skipping th
   assert.equal(next('pink', 2), null);
   assert.equal(next('yellow', 1), null);
 });
+
+test('upward gestures return one scene at a time until home', () => {
+  const previous = scrollSequence.previousSceneForScroll;
+  assert.equal(previous('beige'), 'yellow');
+  assert.equal(previous('yellow'), 'pink');
+  assert.equal(previous('pink'), 'home');
+  assert.equal(previous('home'), null);
+});

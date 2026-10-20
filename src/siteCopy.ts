@@ -15,7 +15,7 @@ export const siteCopy = {
     ],
   },
   work: {
-    title: '我们怎么工作',
+    title: '方法',
     principles: [
       { name: '品味', description: '我们投资于对真实世界的感知，能落地的创造力。' },
       { name: '信任', description: '我们押注志趣相投的创始人，然后陪她们摸爬滚打。' },
@@ -23,7 +23,7 @@ export const siteCopy = {
     ],
   },
   join: {
-    title: '欢迎加入',
+    title: '如何加入',
     contributor: {
       heading: '如果你是想加入 SIX 的贡献者',
       paragraph: '10-15k入局+持续贡献，我们能给你一手的信息、一群同频的人、一场值得参与的冒险。',

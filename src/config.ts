@@ -11,7 +11,7 @@ export const hero = {
   middle: {
     label: '转向镜头的女性',
     framePath: (i: number) => `./media/middle/frame_${String(i).padStart(3, '0')}.webp`,
-    count: 20, fps: 12, box: { x: 165, y: 320, width: 364, height: 545 },
+    count: 20, fps: 12, box: { x: 560, y: 320, width: 364, height: 545 },
   },
   walkCycle: {
     label: '从左侧走入的女性',

@@ -27,20 +27,23 @@ test('frame sequence signals completion after its final frame', () => {
   assert.match(source, /else onCompleteRef\.current\?\.\(\)/);
 });
 
-test('chapter text starts after its scene transition while figure animation may continue', async () => {
+test('pink and yellow figures start with their transitions while chapter text retains its reveal timing', async () => {
   const vite = await createServer({ configFile: './vite.config.ts', server: { middlewareMode: true }, appType: 'custom', logLevel: 'silent' });
   try {
-    const { isChapterContentReady, PINK_COVER_PROGRESS } = await vite.ssrLoadModule('/src/chapterContentTiming.ts');
+    const { isChapterContentReady, PINK_COVER_PROGRESS, YELLOW_TEXT_START_PROGRESS } = await vite.ssrLoadModule('/src/chapterContentTiming.ts');
     assert.equal(isChapterContentReady('pink', PINK_COVER_PROGRESS - 0.01), false);
     assert.equal(isChapterContentReady('pink', PINK_COVER_PROGRESS), true);
+    assert.equal(YELLOW_TEXT_START_PROGRESS, 2 / 3);
+    assert.equal(isChapterContentReady('yellow', YELLOW_TEXT_START_PROGRESS - 0.01), false);
+    assert.equal(isChapterContentReady('yellow', YELLOW_TEXT_START_PROGRESS), true);
     assert.equal(isChapterContentReady('yellow', 1), true);
     assert.equal(isChapterContentReady('beige', 1), true);
     assert.equal(isChapterContentReady('home', 1), false);
     const app = readFileSync(fileURLToPath(new URL('../src/App.tsx', import.meta.url)), 'utf8');
     assert.doesNotMatch(app, /chapterAnimationCompleteScene/);
     assert.match(app, /isChapterContentReady\(scene, progress\)/);
-    assert.match(app, /clip=\{hero\.seated\} active=\{scene === 'pink' && progress >= PINK_COVER_PROGRESS\}/);
-    assert.match(app, /clip=\{hero\.middle\} active=\{scene === 'yellow' && progress >= 1\}/);
+    assert.match(app, /clip=\{hero\.seated\} active=\{scene === 'pink'\}/);
+    assert.match(app, /clip=\{hero\.middle\} active=\{scene === 'yellow'\}/);
     assert.match(app, /scene === 'beige' && beigeExitComplete && <div className="third-walker-enter">[\s\S]*?<\/div>\}/);
   } finally {
     await vite.close();

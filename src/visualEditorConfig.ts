@@ -1,4 +1,4 @@
-export const EDITOR_STORAGE_KEY = 'six-homepage-visual-editor-v1';
+export const EDITOR_STORAGE_KEY = 'six-homepage-visual-editor-v2';
 
 export const LAYER_IDS = [
   'background', 'leftFigure', 'centerFigure', 'rightFigure', 'pinkReveal', 'headline',
@@ -40,17 +40,17 @@ export interface StorageLike {
 export const DEFAULT_EDITOR_CONFIG: EditorConfig = {
   layers: {
     background: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 0 },
-    leftFigure: { x: -84.31307952924395, y: 87.66923564189189, scale: 1.53, scaleX: 1, scaleY: 1, zIndex: 5 },
-    centerFigure: { x: -13, y: 46, scale: 1, scaleX: 1, scaleY: 1, zIndex: 3 },
-    rightFigure: { x: 0, y: -197, scale: 1, scaleX: 1, scaleY: 1, zIndex: 1 },
+    leftFigure: { x: -170, y: 40, scale: 1.8, scaleX: 1, scaleY: 1, zIndex: 5 },
+    centerFigure: { x: -115, y: -25, scale: 1.08, scaleX: 1, scaleY: 1, zIndex: 3 },
+    rightFigure: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 1 },
     pinkReveal: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 2 },
-    headline: { x: -73, y: -130, scale: 0.91, scaleX: 1, scaleY: 1, zIndex: 4 },
+    headline: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 4 },
   },
   text: {
     eyebrow: 'SIX',
     title: '与年轻的创业家\n一起冒险',
     description: '有想象力、有活力、有胆识的新一代创业者，\n和她们的新冒险。',
-    button: '了解我们　→',
+    button: '加入我们　→',
   },
 };
 
@@ -113,6 +113,7 @@ export function loadEditorConfig(storage?: StorageLike | null): EditorConfig {
     const textOverrides: Partial<HomeText> = {};
     if (isRecord(parsed.text)) {
       for (const key of ['eyebrow', 'title', 'description', 'button'] as const) {
+        if (key === 'button' && (parsed.text[key] === '探索项目　→' || parsed.text[key] === '认识我们　→')) continue;
         if (typeof parsed.text[key] === 'string' && (parsed.text[key] as string).length <= 500) {
           textOverrides[key] = parsed.text[key] as string;
         }

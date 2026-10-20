@@ -12,7 +12,7 @@ test('production bundle omits editor controls and local storage', () => {
   const assets = readdirSync(resolve(root, 'dist/assets'));
   const bundles = assets.filter(name => name.endsWith('.js') || name.endsWith('.css')).map(name => readFileSync(resolve(root, 'dist/assets', name), 'utf8'));
   const bundle = bundles.join('\n');
-  for (const editorOnlyText of ['编辑页面', '导出 JSON', '恢复默认', 'six-homepage-visual-editor-v1', 'localStorage', '.visual-editor', '.editor-drag-target']) {
+  for (const editorOnlyText of ['编辑页面', '导出 JSON', '恢复默认', 'six-homepage-visual-editor-v2', 'localStorage', '.visual-editor', '.editor-drag-target']) {
     assert.ok(!bundle.includes(editorOnlyText), `production bundle leaked ${editorOnlyText}`);
   }
 });

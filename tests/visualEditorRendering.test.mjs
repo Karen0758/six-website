@@ -33,18 +33,12 @@ test('homepage renders edited copy and layer transforms while keeping character 
     assert.match(html, /translate\(5\.967vw, -4\.26vh\) scale\(1\.2\)/);
     assert.match(html, /translate\(1\.79vw, 5\.325vh\) scale\(1\.61, 1\.26\)/);
     assert.match(html, /class="figure figure-leaning home-exit-down"[^>]+translate\(11\.933vw, 2\.662vh\) scale\(1\.3\)/);
-    assert.match(html, /class="figure figure-walker"[^>]+translate\(-4\.475vw, 0vh\) scale\(0\.9\)/);
-    assert.ok(html.includes('aria-label="点击左侧人物卡片'));
-    assert.ok(html.includes('aria-label="点击黄色区域人物'));
-    assert.ok(html.includes('aria-label="点击右侧人物，黄紫色向左、粉色与人物向下退出'));
-    for (const [label, action] of [
-      ['我们是谁', '粉色纸纹铺满屏幕并播放站起动作'],
-      ['怎么工作', '黄色纸纹从中心铺满屏幕并播放转向镜头的动作'],
-      ['加入 SIX', '黄紫色向左、粉色与人物向下退出，人物从左侧走入米色纸纹画面'],
-    ]) {
-      assert.ok(html.includes(`>${label}</button>`), `missing clickable chapter label: ${label}`);
-      assert.ok(html.includes(`aria-label="${label}，${action}"`), `${label} should announce its matching scene action`);
-    }
+    assert.match(html, /class="home-background home-exit-down"/);
+    assert.doesNotMatch(html, /class="figure figure-walker"/, 'third figure must not appear on the homepage');
+    assert.ok(html.includes('aria-label="点击第一个人物，查看我们是谁'));
+    assert.ok(html.includes('aria-label="点击中间黄色人物，查看方法'));
+    assert.ok(html.includes('aria-label="点击米色区域，查看如何加入'));
+    assert.doesNotMatch(html, /class="chapter-label/);
   } finally {
     await vite.close();
   }

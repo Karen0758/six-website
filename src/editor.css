@@ -11,6 +11,7 @@
   font: inherit;
   cursor: pointer;
 }
+.scene--home .editor-toggle { top: auto; bottom: 16px; }
 .visual-editor {
   position: fixed;
   z-index: 51;
