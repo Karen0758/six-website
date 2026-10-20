@@ -5,3 +5,4 @@ dist/
 *.log
 /public/media/*
 !/public/media/README.md
+.vercel
