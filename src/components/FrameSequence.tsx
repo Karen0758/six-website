@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { hero } from '../config';
 import { interpolateBox, yellowRevealRadius } from '../animationGeometry';
 import { mobileCanvas, mobileMiddleBox, mobileSeatedBox, mobileStandingBox, mobileWalkerBox } from '../mobileLayout';
+import { getSiteCopy, type Language } from '../siteCopy';
 
 type Clip = typeof hero.seated | typeof hero.middle | typeof hero.walkCycle;
 
@@ -69,9 +70,10 @@ interface FrameSequenceProps {
   translateX?: number;
   onComplete?: () => void;
   mobile?: boolean;
+  language?: Language;
 }
 
-export default function FrameSequence({ clip, active, revealProgress, revealOrigin = { x: hero.width / 2, y: hero.height / 2 }, translateX = 0, onComplete, mobile = false }: FrameSequenceProps) {
+export default function FrameSequence({ clip, active, revealProgress, revealOrigin = { x: hero.width / 2, y: hero.height / 2 }, translateX = 0, onComplete, mobile = false, language = 'cn' }: FrameSequenceProps) {
   const [index, setIndex] = useState(0);
   const [error, setError] = useState('');
   const raf = useRef(0);
@@ -101,7 +103,7 @@ export default function FrameSequence({ clip, active, revealProgress, revealOrig
         else onCompleteRef.current?.();
       }
       raf.current = requestAnimationFrame(tick);
-    }).catch(caught => setError(caught instanceof Error ? caught.message : '动作帧加载失败'));
+    }).catch(() => setError(ui.loadError));
     return () => { runId.current++; cancelAnimationFrame(raf.current); };
   }, [active, clip, firstFrame]);
 
@@ -114,10 +116,12 @@ export default function FrameSequence({ clip, active, revealProgress, revealOrig
       ? interpolateBox(clip.box, clip.activeBox, sequenceProgress)
       : clip.box;
   const canvas = mobile ? mobileCanvas : hero;
+  const ui = getSiteCopy(language).ui;
+  const accessibleLabel = clip === hero.seated ? ui.seatedFigure : clip === hero.middle ? ui.middleFigureImage : ui.walkingFigure;
   const clipId = `frame-reveal-${clip.framePath(0).replace(/[^a-z0-9]/gi, '-')}`;
   return <svg className={`figure-sequence ${clip === hero.middle ? 'figure-sequence-middle' : ''} ${clip === hero.walkCycle ? 'figure-sequence-walker' : ''}`}
     viewBox={`0 0 ${canvas.width} ${canvas.height}`} preserveAspectRatio={mobile ? 'xMidYMid meet' : 'xMidYMid slice'}
-    aria-label={clip.label} role="img">
+    aria-label={accessibleLabel} role="img">
     {revealProgress !== undefined && <defs><clipPath id={clipId} clipPathUnits="userSpaceOnUse">
       <circle cx={revealOrigin.x} cy={revealOrigin.y}
         r={yellowRevealRadius(revealProgress, canvas.width, canvas.height, revealOrigin.x, revealOrigin.y)} />

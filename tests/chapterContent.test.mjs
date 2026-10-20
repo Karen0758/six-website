@@ -45,3 +45,24 @@ test('chapter copy fades in as separate, staggered text blocks', async () => {
     await vite.close();
   }
 });
+
+test('English chapters render English copy and email controls', async () => {
+  const vite = await createServer({ configFile: './vite.config.ts', server: { middlewareMode: true }, appType: 'custom', logLevel: 'silent' });
+  try {
+    const { default: ChapterContent } = await vite.ssrLoadModule('/src/components/ChapterContent.tsx');
+    const render = scene => renderToStaticMarkup(React.createElement(ChapterContent, { scene, animationDurationMs: 3000, language: 'en' }));
+    const about = render('pink');
+    assert.ok(about.includes('About Us'));
+    assert.ok(about.includes('SIX is an experiment in value investing.'));
+    const work = render('yellow');
+    assert.ok(work.includes('Our Approach'));
+    assert.ok(work.includes('Judgment'));
+    const join = render('beige');
+    assert.ok(join.includes('Join Us'));
+    assert.ok(join.includes('Email us'));
+    assert.ok(join.includes('Send an email to xiaozhege@six.com'));
+    assert.ok(!/[\u3400-\u9fff]/.test(about + work + join), 'English chapters should contain no Chinese text');
+  } finally {
+    await vite.close();
+  }
+});

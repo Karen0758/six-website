@@ -44,6 +44,32 @@ body { overflow: hidden; }
   background: #4e1a41;
 }
 
+.language-switcher {
+  position: absolute;
+  z-index: 30;
+  top: 3.4%;
+  right: 4%;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #4e1a41;
+  font: 500 12px/1 "Newsreader", Georgia, serif;
+  letter-spacing: .08em;
+}
+.language-switcher button {
+  padding: 5px 1px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  opacity: .62;
+  cursor: pointer;
+}
+.language-switcher button.is-active { border-bottom-color: currentColor; opacity: 1; }
+.language-switcher button:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; }
+.language-switcher > span { opacity: .42; }
+
 .background, .figure, .home-background {
   position: absolute;
   inset: 0;
@@ -134,6 +160,30 @@ body { overflow: hidden; }
 }
 .headline-title span { display: block; }
 .headline-title span:last-child { font-size: inherit; }
+.scene--english .headline-title {
+  width: 39%;
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: clamp(38px, 3.8vw, 66px);
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+.scene--english .learn-more,
+.scene--english .figure-caption,
+.scene--english .scroll-cue,
+.scene--english .return-home {
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  letter-spacing: .015em;
+}
+.scene--english .learn-more { font-size: clamp(16px, 1.35vw, 21px); }
+.scene--english .figure-caption { font-size: clamp(13px, .95vw, 16px); }
+.scene--english .chapter-content h2,
+.scene--english .chapter-content h3,
+.scene--english .work-principles strong {
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  letter-spacing: 0;
+}
+.scene--english .chapter-content p,
+.scene--english .join-contact a { font-family: "Newsreader", Georgia, "Times New Roman", serif; }
 .headline p { display: none; }
 .learn-more {
   position: absolute;
@@ -310,10 +360,17 @@ body { overflow: hidden; }
 }
 
 @media (max-width: 700px) {
+  .language-switcher { top: 3%; right: 6%; font-size: 11px; }
   .scene--home .headline { transform: none !important; z-index: 6 !important; }
   .brand-wordmark { left: 6%; top: 4%; font-size: clamp(68px, 23vw, 96px); }
   .headline-title { left: 6%; top: 16%; width: 88%; font-size: clamp(30px, 8vw, 38px); line-height: 1.28; }
   .headline-title span:last-child { font-size: inherit; }
+  .scene--english .headline-title {
+    top: 17%;
+    width: 88%;
+    font-size: clamp(28px, 7.1vw, 37px);
+    line-height: 1.2;
+  }
   .learn-more { left: 6%; top: 33%; min-width: 0; padding: 10px 22px; font-size: 17px; }
 
   .scene:not(.scene--beige) .figure-leaning {
@@ -331,6 +388,7 @@ body { overflow: hidden; }
   .figure-hit-middle { left: 45%; top: 43%; width: 55%; height: 52%; }
   .figure-hit-right { display: none; }
   .figure-caption { font-size: 13px; padding: .45em .25em; }
+  .scene--english .figure-caption { font-size: 12px; }
   .figure-caption-left { left: 6%; top: 62%; bottom: auto; }
   .figure-caption-middle { left: 54%; top: 45%; }
 

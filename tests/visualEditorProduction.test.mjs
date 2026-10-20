@@ -7,12 +7,12 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 
-test('production bundle omits editor controls and local storage', () => {
+test('production bundle omits editor controls and editor storage', () => {
   execFileSync('npm', ['run', 'build'], { cwd: root, stdio: 'pipe' });
   const assets = readdirSync(resolve(root, 'dist/assets'));
   const bundles = assets.filter(name => name.endsWith('.js') || name.endsWith('.css')).map(name => readFileSync(resolve(root, 'dist/assets', name), 'utf8'));
   const bundle = bundles.join('\n');
-  for (const editorOnlyText of ['编辑页面', '导出 JSON', '恢复默认', 'six-homepage-visual-editor-v2', 'localStorage', '.visual-editor', '.editor-drag-target']) {
+  for (const editorOnlyText of ['编辑页面', '导出 JSON', '恢复默认', 'six-homepage-visual-editor-v2', '.visual-editor', '.editor-drag-target']) {
     assert.ok(!bundle.includes(editorOnlyText), `production bundle leaked ${editorOnlyText}`);
   }
 });

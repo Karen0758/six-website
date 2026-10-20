@@ -8,7 +8,7 @@ import VisualEditor from './components/VisualEditor';
 import ChapterContent from './components/ChapterContent';
 import { isChapterContentReady } from './chapterContentTiming';
 import { sceneForHomeEntry } from './homeNavigation';
-import { siteCopy } from './siteCopy';
+import { getSiteCopy, type Language } from './siteCopy';
 import { mobileCanvas, mobilePinkPath, mobileWalkerMotionWidth, mobileYellowBand, mobileYellowOrigin } from './mobileLayout';
 
 if (import.meta.env.DEV && typeof window !== 'undefined') void import('./editor.css');
@@ -22,6 +22,11 @@ const yellowRevealOrigin = { x: hero.width * 0.2, y: hero.height / 2 };
 const homePinkPath = 'M0 405 C185 490 415 585 594 674 C830 804 1260 887 1640 939 H0Z';
 
 export default function App({ initialConfig }: { initialConfig?: EditorConfig } = {}) {
+  const [language, setLanguage] = useState<Language>(() => {
+    if (typeof window === 'undefined') return 'cn';
+    try { return window.localStorage.getItem('six-language') === 'en' ? 'en' : 'cn'; } catch { return 'cn'; }
+  });
+  const copy = getSiteCopy(language);
   const [mobile, setMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 700px)').matches);
   const [scene, setScene] = useState<Scene>('home');
   const [editorOpen, setEditorOpen] = useState(false);
@@ -29,6 +34,7 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
     ? (initialConfig ?? loadEditorConfig())
     : DEFAULT_EDITOR_CONFIG);
   const visual = resolveEditorConfig(DEFAULT_EDITOR_CONFIG, editorConfig);
+  const homeCopy = language === 'cn' ? visual.text : copy.home;
   const [progress, setProgress] = useState(0);
   const [beigeExitComplete, setBeigeExitComplete] = useState(false);
   const [walkEnterProgress, setWalkEnterProgress] = useState(0);
@@ -41,6 +47,16 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
   const preloadCountRef = useRef(0);
 
   useEffect(() => () => cancelAnimationFrame(raf.current), []);
+
+  useEffect(() => {
+    try { window.localStorage.setItem('six-language', language); } catch { /* storage may be disabled */ }
+    document.documentElement.lang = language === 'en' ? 'en' : 'zh-CN';
+    document.title = language === 'en' ? 'SIX | An adventure with young founders' : 'SIX · 与年轻的创业家一起冒险';
+    const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    if (description) description.content = language === 'en'
+      ? 'SIX is an experiment in value investing. We back founders with imagination, energy, and courage.'
+      : 'SIX 是一场价值投资实验。与年轻的创业家一起冒险。';
+  }, [language]);
 
   useEffect(() => {
     const query = window.matchMedia('(max-width: 700px)');
@@ -111,7 +127,7 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
     try {
       await preload;
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : '动作帧加载失败');
+      setError(copy.ui.loadError);
     } finally {
       preloadCountRef.current--;
       setLoading(preloadCountRef.current > 0);
@@ -247,7 +263,12 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
     headline: { ...styleFor('headline'), left: '7%', top: '19%', width: '45%', height: '68%', zIndex: 25 },
   };
 
-  return <main className={`scene scene--${scene}`} aria-label="SIX 官网首页主视觉，可点击人物卡片或向下滚动依次体验三段动作">
+  return <main className={`scene scene--${scene} ${language === 'en' ? 'scene--english' : ''}`} aria-label={copy.ui.main}>
+    <div className="language-switcher" role="group" aria-label={copy.ui.language}>
+      <button type="button" className={language === 'en' ? 'is-active' : ''} aria-pressed={language === 'en'} onClick={() => setLanguage('en')}>EN</button>
+      <span aria-hidden="true">/</span>
+      <button type="button" className={language === 'cn' ? 'is-active' : ''} aria-pressed={language === 'cn'} onClick={() => setLanguage('cn')}>CN</button>
+    </div>
     {scene === 'beige' && <>
       <img className="beige-background" src={hero.thirdBackground} width={hero.width} height={hero.height} alt="" />
       {!beigeExitComplete && <svg className="beige-transition-art" viewBox={`0 0 ${canvas.width} ${canvas.height}`} preserveAspectRatio="none" aria-hidden="true">
@@ -276,16 +297,16 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
       <image href={hero.yellowTexture} x="0" y="0" width={canvas.width} height={canvas.height} preserveAspectRatio={mobile ? 'xMidYMid slice' : 'none'} clipPath="url(#home-yellow-clip)" />
       <image href="./media/pink-paper-wide.webp" x="0" y="0" width={canvas.width} height={canvas.height} preserveAspectRatio={mobile ? 'xMidYMid slice' : 'none'} clipPath="url(#home-pink-clip)" />
     </svg>}
-    <img className="figure figure-leaning home-exit-down" src={hero.leaning.image} width={hero.width} height={hero.height} alt={hero.leaning.label} style={styleFor('centerFigure')} />
+    <img className="figure figure-leaning home-exit-down" src={hero.leaning.image} width={hero.width} height={hero.height} alt={copy.ui.leaningFigure} style={styleFor('centerFigure')} />
 
     <div className={`headline home-exit-down ${scene !== 'home' ? 'headline-exiting' : ''}`} style={styleFor('headline')}>
       <h1 className="brand-wordmark">{visual.text.eyebrow}</h1>
-      <h2 className="headline-title">{visual.text.title.split('\n').map((line, index) => <span key={`${line}-${index}`}>{line}</span>)}</h2>
-      <p>{visual.text.description.split('\n').map((line, index) => <span key={`${line}-${index}`}>{index > 0 && <br />}{line}</span>)}</p>
+      <h2 className="headline-title">{homeCopy.title.split('\n').map((line, index) => <span key={`${line}-${index}`}>{line}</span>)}</h2>
+      <p>{homeCopy.description.split('\n').map((line, index) => <span key={`${line}-${index}`}>{index > 0 && <br />}{line}</span>)}</p>
       <button className="learn-more" type="button"
         onPointerEnter={() => { void preloadFrames(hero.walkCycle).catch(() => {}); }}
         onFocus={() => { void preloadFrames(hero.walkCycle).catch(() => {}); }}
-        onClick={() => void begin(sceneForHomeEntry('joinCta'))} disabled={scene !== 'home' || loading}>{visual.text.button}</button>
+        onClick={() => void begin(sceneForHomeEntry('joinCta'))} disabled={scene !== 'home' || loading}>{language === 'cn' ? visual.text.button : copy.home.button}</button>
     </div>
 
     {(scene === 'pink' || scene === 'yellow') && <svg className="pink-wave home-exit-down" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" style={styleFor('pinkReveal')}>
@@ -313,17 +334,17 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
       </g>
     </svg>}
 
-    {scene !== 'yellow' && <div className="sequence-editor-layer home-exit-down" style={leftFigureStyle}><FrameSequence clip={hero.seated} active={scene === 'pink'} mobile={mobile} /></div>}
-    {scene === 'yellow' && <div className="sequence-editor-layer" style={styleFor('centerFigure')}><FrameSequence clip={hero.middle} active={scene === 'yellow'} revealProgress={progress} revealOrigin={sceneYellowOrigin} mobile={mobile} /></div>}
+    {scene !== 'yellow' && <div className="sequence-editor-layer home-exit-down" style={leftFigureStyle}><FrameSequence clip={hero.seated} active={scene === 'pink'} mobile={mobile} language={language} /></div>}
+    {scene === 'yellow' && <div className="sequence-editor-layer" style={styleFor('centerFigure')}><FrameSequence clip={hero.middle} active={scene === 'yellow'} revealProgress={progress} revealOrigin={sceneYellowOrigin} mobile={mobile} language={language} /></div>}
     {scene === 'beige' && beigeExitComplete && <div className="third-walker-enter">
-      <FrameSequence clip={hero.walkCycle} active translateX={thirdEnterMotion.enterX} mobile={mobile} />
+      <FrameSequence clip={hero.walkCycle} active translateX={thirdEnterMotion.enterX} mobile={mobile} language={language} />
     </div>}
-    {isChapterContentReady(scene, progress) && <ChapterContent scene={scene} animationDurationMs={chapterAnimationDurationMs} />}
-    {(scene === 'pink' || scene === 'yellow') && progress >= 1 && <button className="scroll-cue" type="button" onClick={requestScrollAdvance} aria-label="继续下滑或点击进入下一页">
-      <span>继续下滑</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v16m-6-6 6 6 6-6" /></svg>
+    {isChapterContentReady(scene, progress) && <ChapterContent scene={scene} animationDurationMs={chapterAnimationDurationMs} language={language} />}
+    {(scene === 'pink' || scene === 'yellow') && progress >= 1 && <button className="scroll-cue" type="button" onClick={requestScrollAdvance} aria-label={copy.ui.scrollAria}>
+      <span>{copy.ui.scroll}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v16m-6-6 6 6 6-6" /></svg>
     </button>}
-    {scene === 'beige' && progress >= 1 && <button className="return-home" type="button" onClick={returnHome} aria-label="返回主页">
-      <span>返回主页</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12H4m6-6-6 6 6 6" /></svg>
+    {scene === 'beige' && progress >= 1 && <button className="return-home" type="button" onClick={returnHome} aria-label={copy.ui.home}>
+      <span>{copy.ui.home}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12H4m6-6-6 6 6 6" /></svg>
     </button>}
 
     {scene === 'home' && <>
@@ -331,34 +352,34 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
         onPointerEnter={() => { void preloadFrames(hero.seated).catch(() => {}); }}
         onFocus={() => { void preloadFrames(hero.seated).catch(() => {}); }}
         onClick={() => void begin(sceneForHomeEntry('firstFigure'))}
-        aria-label={`第一个人物：${siteCopy.about.title}`}>
-        <span className="figure-caption-number">01</span><span className="figure-caption-name">{siteCopy.about.title}</span><svg className="figure-caption-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5 M9 5h10v10" /></svg>
+        aria-label={`01 ${copy.ui.aboutCaption}`}>
+        <span className="figure-caption-number">01</span><span className="figure-caption-name">{copy.ui.aboutCaption}</span><svg className="figure-caption-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5 M9 5h10v10" /></svg>
       </button>
       <button className="figure-caption figure-caption-middle" type="button"
         onPointerEnter={() => { void preloadFrames(hero.middle).catch(() => {}); }}
         onFocus={() => { void preloadFrames(hero.middle).catch(() => {}); }}
         onClick={() => void begin(sceneForHomeEntry('middleFigure'))}
-        aria-label={`中间黄色人物：${siteCopy.work.title}`}>
-        <span className="figure-caption-number">02</span><span className="figure-caption-name">{siteCopy.work.title}</span><svg className="figure-caption-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5 5 19 M5 9v10h10" /></svg>
+        aria-label={`02 ${copy.ui.workCaption}`}>
+        <span className="figure-caption-number">02</span><span className="figure-caption-name">{copy.ui.workCaption}</span><svg className="figure-caption-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5 5 19 M5 9v10h10" /></svg>
       </button>
       <button className="figure-hit figure-hit-left" type="button"
         onPointerEnter={() => { void preloadFrames(hero.seated).catch(() => {}); }}
         onFocus={() => { void preloadFrames(hero.seated).catch(() => {}); }}
         onClick={() => void begin(sceneForHomeEntry('firstFigure'))}
-        aria-label="点击第一个人物，查看我们是谁并播放站起动作" style={leftHitStyle} />
+        aria-label={copy.ui.firstFigure} style={leftHitStyle} />
       <button className="figure-hit figure-hit-middle" type="button"
         onPointerEnter={() => { void preloadFrames(hero.middle).catch(() => {}); }}
         onFocus={() => { void preloadFrames(hero.middle).catch(() => {}); }}
         onClick={() => void begin(sceneForHomeEntry('middleFigure'))}
-        aria-label="点击中间黄色人物，查看方法并播放转向镜头的动作" style={middleHitStyle} />
+        aria-label={copy.ui.middleFigure} style={middleHitStyle} />
       <button className="figure-hit figure-hit-right" type="button"
         onPointerEnter={() => { void preloadFrames(hero.walkCycle).catch(() => {}); }}
         onFocus={() => { void preloadFrames(hero.walkCycle).catch(() => {}); }}
         onClick={() => void begin(sceneForHomeEntry('thirdRegion'))}
-        aria-label="点击米色区域，查看如何加入并播放第三个人物动画" style={styleFor('rightFigure')} />
+        aria-label={copy.ui.thirdFigure} style={styleFor('rightFigure')} />
     </>}
     {import.meta.env.DEV && <VisualEditor open={editorOpen} config={visual} onChange={updateEditorConfig} onReset={restoreEditorDefaults} onExport={downloadEditorConfig} onToggle={() => setEditorOpen(value => !value)} dragStyles={editorDragStyles} />}
-    {loading && scene === 'home' && <div className="loading-note" role="status">准备动作…</div>}
+    {loading && scene === 'home' && <div className="loading-note" role="status">{copy.ui.loading}</div>}
     {error && <div className="error-note" role="alert">{error}</div>}
   </main>;
 }
