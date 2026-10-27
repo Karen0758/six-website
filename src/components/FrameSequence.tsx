@@ -71,9 +71,10 @@ interface FrameSequenceProps {
   onComplete?: () => void;
   mobile?: boolean;
   language?: Language;
+  stillFrame?: number;
 }
 
-export default function FrameSequence({ clip, active, revealProgress, revealOrigin = { x: hero.width / 2, y: hero.height / 2 }, translateX = 0, onComplete, mobile = false, language = 'cn' }: FrameSequenceProps) {
+export default function FrameSequence({ clip, active, revealProgress, revealOrigin = { x: hero.width / 2, y: hero.height / 2 }, translateX = 0, onComplete, mobile = false, language = 'cn', stillFrame }: FrameSequenceProps) {
   const [index, setIndex] = useState(0);
   const [error, setError] = useState('');
   const raf = useRef(0);
@@ -107,12 +108,13 @@ export default function FrameSequence({ clip, active, revealProgress, revealOrig
     return () => { runId.current++; cancelAnimationFrame(raf.current); };
   }, [active, clip, firstFrame]);
 
-  const sequenceProgress = active ? Math.max(0, index - firstFrame) / Math.max(clip.count - 1 - firstFrame, 1) : 0;
+  const displayedFrame = !active && stillFrame !== undefined ? stillFrame : index;
+  const sequenceProgress = active ? Math.max(0, index - firstFrame) / Math.max(clip.count - 1 - firstFrame, 1) : stillFrame !== undefined ? 1 : 0;
   const box = mobile
     ? clip === hero.seated
-      ? active ? interpolateBox(mobileSeatedBox, mobileStandingBox, sequenceProgress) : mobileSeatedBox
+      ? active || stillFrame !== undefined ? interpolateBox(mobileSeatedBox, mobileStandingBox, sequenceProgress) : mobileSeatedBox
       : clip === hero.middle ? mobileMiddleBox : mobileWalkerBox
-    : clip === hero.seated && active && clip.activeBox
+    : clip === hero.seated && (active || stillFrame !== undefined) && clip.activeBox
       ? interpolateBox(clip.box, clip.activeBox, sequenceProgress)
       : clip.box;
   const canvas = mobile ? mobileCanvas : hero;
@@ -127,7 +129,7 @@ export default function FrameSequence({ clip, active, revealProgress, revealOrig
         r={yellowRevealRadius(revealProgress, canvas.width, canvas.height, revealOrigin.x, revealOrigin.y)} />
     </clipPath></defs>}
     <g clipPath={revealProgress !== undefined ? `url(#${clipId})` : undefined} transform={`translate(${translateX} 0)`}>
-      <image href={clip.framePath(index)} x={box.x} y={box.y} width={box.width} height={box.height} preserveAspectRatio="none" />
+      <image href={clip.framePath(displayedFrame)} x={box.x} y={box.y} width={box.width} height={box.height} preserveAspectRatio="none" />
     </g>
     {error && <title>{error}</title>}
   </svg>;

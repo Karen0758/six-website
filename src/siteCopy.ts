@@ -10,16 +10,19 @@ const copy = {
     about: {
       title: '我们是谁',
       statement: 'SIX 是一场价值投资实验。',
+      introduction: 'SIX 始于六个人，来自风险投资、慈善、文化、法律等不同领域。',
+      foundersLabel: '认识发起合伙人',
+      foundersHeading: 'SIX 的发起合伙人们',
+      foundersPoints: [
+        '管理过中国大陆规模最大的性别视角投资（Gender Lens Investing，按 AUM 计）',
+        '是中国大陆面向性别多元社群的最大民间支持单位（2025～26 年，按 AUM 计）',
+        '是中国有效公益（Effective Giving）社群的早期支持者与建设者',
+        '全员出身一线：在科技与互联网企业落地 EDI 最佳实践、主导推进省级反家暴机制、2004 年起创办或主管 3 家行业领先的社会创业项目（social entrepreneurship）',
+      ],
       paragraphs: [
-        [
-          'SIX 始于六个人，来自慈善、风险投资、文化、法律等不同领域。',
-          '我们身处一个新的时代，想看到有想象力、有活力、有胆识的新一代创业者，和她们的新冒险。',
-        ],
-        [
-          '我们投资的不仅是钱。',
-          '我们自己，就是资源，也是方法。',
-          '面对新的冒险，我们就是那颗激起涟漪的石子——涟漪散开，就是未来的可能。',
-        ],
+        '我们投资的不仅是钱。',
+        '我们自己，就是资源，也是方法。',
+        '面对新的冒险，我们就是那颗激起涟漪的石子——涟漪散开，就是未来的可能。',
       ],
     },
     work: {
@@ -27,21 +30,21 @@ const copy = {
       principles: [
         { name: '品味', description: '我们投资于对真实世界的感知，能落地的创造力。' },
         { name: '信任', description: '我们押注志趣相投的创始人，然后陪她们摸爬滚打。' },
-        { name: '长期', description: '我们看重的是从0到1的全程，而非退出那天的兑现。' },
+        { name: '长期', description: '我们看重从 0 到 1 的全程，包括不限次数的、坦诚的从头再来。' },
       ],
     },
     join: {
       title: '如何加入',
       contributor: {
-        heading: '如果你是想加入 SIX 的贡献者',
-        paragraph: '10-15k入局+持续贡献，我们能给你一手的信息、一群同频的人、一场值得参与的冒险。',
+        heading: '如果你是想加入 SIX 的贡献者（正式会员）',
+        paragraph: '10–15k CNY',
       },
       founder: {
         heading: '如果你是需要支持的冒险家——',
-        paragraph: '我们给你初创期的判断力、关系和资源，和你需要时，真正的在场。',
+        paragraph: '我们给你初创期的判断力、关系、资源（含 Pre-Seed Fund）。我们随时回复你的信息。',
       },
       email: 'xiaozhege@six.com',
-      locations: '同时，你可以在北京、上海、香港、多伦多、密特罗尼西亚见到我们。',
+      locations: '同时，你可以在北京、上海、香港、多伦多、纽约、密特罗尼西亚见到我们。',
     },
     ui: {
       language: '语言',
@@ -75,16 +78,19 @@ const copy = {
     about: {
       title: 'About Us',
       statement: 'SIX is an experiment in value investing.',
+      introduction: 'SIX began with six people from venture capital, philanthropy, culture, law, and other fields.',
+      foundersLabel: 'Meet the founding partners',
+      foundersHeading: 'The founding partners of SIX',
+      foundersPoints: [
+        'Have managed mainland China’s largest gender-lens investing effort to date, by assets under management (AUM)',
+        'Are mainland China’s largest non-governmental funder of gender-diverse communities (2025–26, by AUM)',
+        'Were early backers and builders of China’s effective-giving community',
+        'All come from the front line: landing best-practice equity, diversity and inclusion (EDI) at technology and internet companies, leading provincial-level anti-domestic-violence programmes, and, since 2004, founding or running three of the sector’s leading social enterprises',
+      ],
       paragraphs: [
-        [
-          'SIX began with six people from philanthropy, venture capital, culture, law, and other fields.',
-          'In a new era, we look for a generation of founders with imagination, energy, and courage—and the adventures they set in motion.',
-        ],
-        [
-          'We invest more than capital.',
-          'We bring our own resources and our own way of working.',
-          'For every new venture, we are the stone that starts a ripple. Each ripple opens up new possibilities.',
-        ],
+        'We invest in more than money.',
+        'We are resources ourselves, and a way of working.',
+        'In every new adventure, we are the stone that sends out ripples—and those ripples open up future possibilities.',
       ],
     },
     work: {
@@ -92,21 +98,21 @@ const copy = {
       principles: [
         { name: 'Judgment', description: 'We invest in a clear reading of the real world and creativity that can take shape in it.' },
         { name: 'Trust', description: 'We back founders who share our curiosity, then work alongside them through the hard parts.' },
-        { name: 'Long Term', description: 'We care about the full journey from 0 to 1, not just the day of exit.' },
+        { name: 'Long Term', description: 'We care about the full journey from 0 to 1, including every honest chance to begin again.' },
       ],
     },
     join: {
       title: 'Join Us',
       contributor: {
-        heading: 'If you want to contribute to SIX',
-        paragraph: 'A 10–15k entry contribution, plus ongoing involvement, brings first-hand insight, a circle of like-minded people, and an adventure worth joining.',
+        heading: 'If you want to contribute to SIX (formal membership)',
+        paragraph: 'CNY 10–15k',
       },
       founder: {
-        heading: 'If you are a founder looking for support',
-        paragraph: 'We bring early-stage judgment, relationships, and resources—and, when you need it, real presence.',
+        heading: 'If you are an adventurer looking for support',
+        paragraph: 'We bring early-stage judgment, relationships, and resources, including a Pre-Seed Fund. We are always ready to reply.',
       },
       email: 'xiaozhege@six.com',
-      locations: 'You can also find us in Beijing, Shanghai, Hong Kong, Toronto, and Micronesia.',
+      locations: 'You can also find us in Beijing, Shanghai, Hong Kong, Toronto, New York, and Micronesia.',
     },
     ui: {
       language: 'Language',

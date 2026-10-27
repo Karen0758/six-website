@@ -8,6 +8,18 @@ export function pinkWavePath(progress: number): string {
   return `M 0 ${startY} C ${10 + shift} ${28 - rise}, ${30 + shift} ${52 - rise}, ${47 + shift} ${72 - rise} S ${76 + shift} ${94 - rise}, ${endX} ${100 - rise} L ${endX} 100 L 0 100 Z`;
 }
 
+export function foundersIvoryWavePath(progress: number, width: number, height: number): string {
+  const p = Math.max(0, Math.min(1, progress));
+  const eased = p * p * (3 - 2 * p);
+  const travel = (1 - eased) * width * 1.24;
+  const topX = travel - width * 0.06;
+  const midX = travel - width * 0.04;
+  const bottomX = travel + width * 0.46;
+  const firstWave = height * 0.76;
+  const bottomWave = height;
+  return `M ${topX} 0 C ${topX - width * 0.06} ${height * 0.18}, ${midX + width * 0.07} ${height * 0.5}, ${midX} ${firstWave} C ${midX - width * 0.02} ${height * 0.89}, ${bottomX - width * 0.13} ${height * 0.98}, ${bottomX} ${bottomWave} L ${width} ${height} L ${width} 0 Z`;
+}
+
 export interface Box { x: number; y: number; width: number; height: number }
 
 export function interpolateBox(from: Box, to: Box, progress: number): Box {

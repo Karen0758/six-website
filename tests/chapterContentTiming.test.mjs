@@ -43,7 +43,7 @@ test('pink and yellow figures start with their transitions while chapter text re
     assert.doesNotMatch(app, /chapterAnimationCompleteScene/);
     assert.match(app, /isChapterContentReady\(scene, progress\)/);
     assert.match(app, /clip=\{hero\.seated\} active=\{scene === 'pink'\}/);
-    assert.match(app, /clip=\{hero\.middle\} active=\{scene === 'yellow'\}/);
+    assert.match(app, /<FrameSequence clip=\{hero\.middle\} active mobile=\{mobile\} language=\{language\} \/>/);
     assert.match(app, /scene === 'beige' && beigeExitComplete && <div className="third-walker-enter">[\s\S]*?<\/div>\}/);
   } finally {
     await vite.close();

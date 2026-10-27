@@ -28,7 +28,7 @@ test('beige scene moves yellow left while pink and homepage figures move down', 
   assert.match(app, /className="beige-exit-yellow"[\s\S]*?translate\(\$\{beigeYellowX\} 0\)[\s\S]*?clipPath="url\(#beige-exit-yellow-clip\)"/);
   assert.doesNotMatch(app, /className="figure figure-walker home-exit-down"/, 'the third figure stays off the homepage');
   assert.match(app, /scene !== 'beige' && <svg className="home-background home-exit-down"/);
-  assert.match(app, /\(scene === 'pink' \|\| scene === 'yellow'\) && <svg className="pink-wave home-exit-down"/);
+  assert.match(app, /\(scene === 'pink' \|\| scene === 'founders' \|\| scene === 'yellow'\) && <svg className="pink-wave home-exit-down"/);
   assert.doesNotMatch(app, /purple/i, 'purple artwork must not return in the beige transition');
   assert.match(styles, /\.beige-transition-art\s*\{[^}]*z-index:\s*0/s);
   assert.doesNotMatch(app, /scene === 'beige' && <svg className="yellow-wave/);
@@ -41,8 +41,11 @@ test('pink reveal covers the editor-positioned middle figure while leaving the s
 });
 
 test('yellow transition reveals a full-screen radial background above the pink wave', () => {
-  const yellow = app.match(/className="yellow-wave home-exit-down"([\s\S]*?)<\/svg>/)?.[1] ?? '';
-  assert.doesNotMatch(yellow, /style=\{styleFor\('centerFigure'\)\}/, 'character positioning must not shift or shrink the full-screen reveal');
+  const yellow = app.match(/scene === 'yellow' && <div className="yellow-reveal"([\s\S]*?)<\/div>\}/)?.[1] ?? '';
+  assert.match(app, /clipPath: `circle\(\$\{yellowMaskRadius\}px at \$\{yellowMaskOrigin\.x\}px \$\{yellowMaskOrigin\.y\}px\)`/, 'one viewport-sized circle clips the yellow paper and the character together');
+  assert.match(yellow, /className="yellow-wave home-exit-down"/);
+  assert.match(yellow, /className="yellow-figure-layer sequence-editor-layer" style=\{styleFor\('centerFigure'\)\}/, 'character position stays independently editable inside the shared reveal');
+  assert.doesNotMatch(yellow, /revealProgress|clipPath="url\(#yellow-background-reveal\)"/, 'the character must not receive a second circular mask');
   assert.match(app, /className="pink-wave home-exit-down"[\s\S]*?d=\{pinkPath\}/, 'the red paper wave remains animated during the yellow reveal');
   const yellowRule = styles.match(/\.yellow-wave\s*\{([^}]+)\}/)?.[1] ?? '';
   assert.match(yellowRule, /inset:\s*0/);
@@ -52,10 +55,8 @@ test('yellow transition reveals a full-screen radial background above the pink w
   assert.ok(sceneLayers, 'yellow scene must define explicit transition layer order');
   assert.match(sceneLayers[1], /z-index:\s*2\s*!important/);
   assert.match(sceneLayers[1], /transform:\s*none\s*!important/);
-  assert.match(sceneLayers[2], /z-index:\s*3\s*!important/);
+  assert.match(sceneLayers[2], /z-index:\s*0\s*!important/);
   assert.match(sceneLayers[2], /transform:\s*none\s*!important/);
-  assert.match(yellow, /cx=\{sceneYellowOrigin\.x\}/);
-  assert.match(yellow, /cy=\{sceneYellowOrigin\.y\}/);
-  assert.match(app, /const yellowRevealOrigin = \{ x: hero\.width \* 0\.2, y: hero\.height \/ 2 \}/);
+  assert.match(styles, /\.yellow-reveal\s*\{[^}]*z-index:\s*3/s, 'shared background and figure mask stay above the pink paper');
   assert.match(config, /count: 20, fps: 12, box: \{ x: 560, y: 320, width: 364, height: 545 \}/);
 });

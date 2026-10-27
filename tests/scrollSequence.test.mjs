@@ -14,26 +14,28 @@ if (existsSync(sourcePath)) {
   scrollSequence = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
 }
 
-test('each downward gesture advances home through the three character scenes in order', () => {
+test('each downward gesture advances through the about and founders pages before the next character', () => {
   const next = scrollSequence.nextSceneForScroll;
   assert.equal(typeof next, 'function');
   assert.equal(next('home'), 'pink');
-  assert.equal(next('pink'), 'yellow');
+  assert.equal(next('pink'), 'founders');
+  assert.equal(next('founders'), 'yellow');
   assert.equal(next('yellow'), 'beige');
   assert.equal(next('beige'), null);
 });
 
 test('queued scroll gestures advance after the current scene without skipping the order', () => {
   const next = scrollSequence.nextSceneForScroll;
-  assert.equal(next('pink', 1), 'beige');
-  assert.equal(next('pink', 2), null);
+  assert.equal(next('pink', 1), 'yellow');
+  assert.equal(next('pink', 2), 'beige');
   assert.equal(next('yellow', 1), null);
 });
 
 test('upward gestures return one scene at a time until home', () => {
   const previous = scrollSequence.previousSceneForScroll;
   assert.equal(previous('beige'), 'yellow');
-  assert.equal(previous('yellow'), 'pink');
+  assert.equal(previous('yellow'), 'founders');
+  assert.equal(previous('founders'), 'pink');
   assert.equal(previous('pink'), 'home');
   assert.equal(previous('home'), null);
 });

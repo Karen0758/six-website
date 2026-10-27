@@ -1,6 +1,6 @@
-# Local media
+# Website media
 
-Generated images and videos are intentionally excluded from Git. The app builds without them, showing a color-block fallback. For the full local preview place these files here:
+The `six-1025-redesign` GitHub branch contains the optimized images and frame sequences needed for the website. Original source videos are not included. These files are the web-ready media:
 
 - `background.webp`, `leaning.webp` — full-canvas 1676×939 scene layers
 - `walker-poster.webp` — retained local right-character poster, no longer loaded on the homepage; `walk-cycle/frame_000.webp` through `frame_048.webp` — right-character walk-in/out sequence, transparent 512×890 WebP with the full source sole and 40px lower clearance

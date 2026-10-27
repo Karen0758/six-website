@@ -1,6 +1,6 @@
-export type ScrollScene = 'home' | 'pink' | 'yellow' | 'beige';
+export type ScrollScene = 'home' | 'pink' | 'founders' | 'yellow' | 'beige';
 
-const SCENE_ORDER: ScrollScene[] = ['home', 'pink', 'yellow', 'beige'];
+const SCENE_ORDER: ScrollScene[] = ['home', 'pink', 'founders', 'yellow', 'beige'];
 
 export function nextSceneForScroll(scene: ScrollScene, queuedAdvances = 0): Exclude<ScrollScene, 'home'> | null {
   const sceneIndex = SCENE_ORDER.indexOf(scene);

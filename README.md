@@ -2,19 +2,19 @@
 
 An independent React/TypeScript website project based on the current Figma Make three-woman home-page composition. It is a foundation for the future full site, not a copy of every Figma Make chapter.
 
-## Local run
+## 本地运行
 
 ```sh
 npm install
 npm run dev
 ```
 
-Run `npm run build` before publishing. To regenerate local media, create a project Python environment, install `requirements-assets.txt`, and run the command in `docs/ANIMATION.md` (ffmpeg is also required). The build output is `dist/`. Media files are kept local for now, so a fresh GitHub checkout shows the color-block fallback until assets are placed in `public/media/`.
+当前 10/25 改版位于独立分支 `six-1025-redesign`，与 `main` 分开，尚未部署到线上域名。此分支包含网页所需的优化图片帧与纹理，不含原始视频。运行 `npm run build` 可检查构建；产物在 `dist/`。如需重做帧图，请在项目 Python 环境安装 `requirements-assets.txt`，并按 `docs/ANIMATION.md` 操作（需要 ffmpeg）。
 
 ## Structure
 
 - `src/` — scene, frame-sequence playback and timing configuration
-- `public/media/` — generated art and frames, excluded from Git
+- `public/media/` — optimized art, textures and playback frames included in this branch; source videos remain local
 - `tools/build_seated_frames.py` — regenerate the seated clip from the user-supplied video
 - `PROJECT.md` — project scope, status, performance targets and release gates
 - `docs/ANIMATION.md` — motion and asset specifications

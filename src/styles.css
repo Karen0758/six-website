@@ -120,10 +120,14 @@ body { overflow: hidden; }
   z-index: 2 !important;
   transform: none !important;
 }
+.scene--founders .pink-paper-image { filter: contrast(1.1) saturate(1.03); }
 .scene--yellow .yellow-wave {
-  z-index: 3 !important;
+  z-index: 0 !important;
   transform: none !important;
 }
+.yellow-reveal { position: absolute; inset: 0; z-index: 3; overflow: hidden; pointer-events: none; will-change: clip-path; }
+.yellow-reveal .yellow-wave { z-index: 0; }
+.yellow-figure-layer { z-index: 1 !important; }
 
 .headline {
   position: absolute;
@@ -140,7 +144,7 @@ body { overflow: hidden; }
   top: 5.5%;
   width: max-content;
   font-family: "Newsreader", Georgia, "Times New Roman", serif;
-  font-size: clamp(76px, 9vw, 155px);
+  font-size: clamp(60px, var(--editor-title-size, 155px), 190px);
   font-weight: 500;
   letter-spacing: .005em;
   line-height: .82;
@@ -152,7 +156,7 @@ body { overflow: hidden; }
   top: 28%;
   width: 40%;
   font-family: "SIX Noto Serif SC", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", "SimSun", serif;
-  font-size: clamp(42px, 4.7vw, 74px);
+  font-size: clamp(30px, var(--editor-subtitle-size, 74px), 110px);
   font-weight: 500;
   line-height: 1.45;
   letter-spacing: .01em;
@@ -163,7 +167,7 @@ body { overflow: hidden; }
 .scene--english .headline-title {
   width: 39%;
   font-family: "Newsreader", Georgia, "Times New Roman", serif;
-  font-size: clamp(38px, 3.8vw, 66px);
+  font-size: clamp(28px, var(--editor-subtitle-size, 66px), 110px);
   line-height: 1.18;
   letter-spacing: 0;
 }
@@ -196,7 +200,7 @@ body { overflow: hidden; }
   color: #4e1a41;
   padding: 14px 32px;
   min-width: 204px;
-  font: 500 clamp(17px, 1.5vw, 24px) "SIX Noto Serif SC", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", serif;
+  font: 500 clamp(14px, var(--editor-body-size, 24px), 40px) "SIX Noto Serif SC", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", serif;
   cursor: pointer;
 }
 .learn-more:disabled { opacity: .7; }
@@ -224,13 +228,13 @@ body { overflow: hidden; }
   border: 0;
   background: transparent;
   color: #4e1a41;
-  font: 500 clamp(13px, 1.05vw, 18px) "SIX Noto Serif SC", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", serif;
+  font: 500 clamp(14px, 1.15vw, 19px) "SIX Noto Serif SC", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", serif;
   letter-spacing: .08em;
   white-space: nowrap;
   cursor: pointer;
 }
 .figure-caption-name { border-bottom: 1px solid currentColor; padding-bottom: .12em; }
-.figure-caption-number { font: 500 .78em Georgia, serif; letter-spacing: .04em; }
+.figure-caption-number { font: 500 .88em Georgia, serif; letter-spacing: .04em; }
 .figure-caption-arrow { width: 1em; height: 1em; align-self: center; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .figure-caption:hover .figure-caption-name { border-bottom-width: 2px; }
 .figure-caption:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
@@ -238,14 +242,19 @@ body { overflow: hidden; }
 .figure-caption-middle { left: 37%; top: 25%; }
 
 .chapter-content {
+  --chapter-title-size: var(--editor-title-size, 52px);
+  --chapter-subtitle-size: var(--editor-subtitle-size, 30px);
+  --chapter-body-size: var(--editor-body-size, 20px);
   position: absolute;
   z-index: 7;
   max-height: 82svh;
   overflow-y: auto;
+  overflow-x: hidden;
   overscroll-behavior: contain;
   padding: clamp(18px, 2.2vw, 36px);
   color: #321b27;
   scrollbar-width: thin;
+  scrollbar-color: rgb(50 27 39 / 50%) transparent;
 }
 .chapter-reveal {
   opacity: 0;
@@ -258,38 +267,147 @@ body { overflow: hidden; }
 .chapter-content h2 {
   margin: 0 0 .65em;
   font-family: "SIX Noto Serif SC", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", "SimSun", serif;
-  font-size: clamp(28px, 3vw, 48px);
+  font-size: var(--chapter-title-size);
   font-weight: 500;
   line-height: 1.25;
 }
 .chapter-content h3 {
   margin: 1.5em 0 .55em;
   font-family: "SIX Noto Serif SC", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", "SimSun", serif;
-  font-size: clamp(19px, 1.65vw, 27px);
+  font-size: var(--chapter-subtitle-size);
   font-weight: 500;
   line-height: 1.45;
 }
-.chapter-content p { margin: 0 0 1em; font-size: clamp(15px, 1.2vw, 19px); line-height: 1.85; }
-.chapter-content--pink { top: 12%; right: 5%; width: min(37vw, 590px); }
-.chapter-content--yellow { top: 16%; right: 4%; width: min(35vw, 560px); }
+.chapter-content p { margin: 0 0 1em; font-size: var(--chapter-body-size); line-height: 1.75; }
+.chapter-content--pink {
+  top: 4%;
+  right: 4%;
+  width: min(45vw, 700px);
+  height: 92svh;
+  max-height: 92svh;
+  padding: clamp(12px, 1.6vw, 26px);
+  background: transparent;
+}
+.founders-paper-wave {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.founders-landscape {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+.founders-yellow-edge {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: clamp(64px, 5.5vw, 98px);
+  background: #d9a534 url('/media/yellow-paper.webp') center / cover no-repeat;
+}
+.founders-tree-crop {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: min(42vw, 640px);
+  height: min(88vh, 820px);
+  overflow: hidden;
+  mix-blend-mode: multiply;
+}
+.founders-tree-crop img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: right bottom;
+}
+.chapter-content--founders {
+  inset: 0;
+  width: 100%;
+  max-height: 100svh;
+  padding: clamp(30px, 5vw, 76px) clamp(28px, 7vw, 120px);
+}
+.founders-page-inner { max-width: 1420px; margin: 0 auto; padding-right: clamp(74px, 8.5vw, 140px); }
+.founders-page-heading { border-bottom: 1px solid currentColor; }
+.chapter-content--founders h2 { display: block; margin-bottom: .35em; line-height: 1.25; letter-spacing: 0; text-wrap: balance; }
+.founders-brand { flex: 0 0 auto; font-family: "Newsreader", Georgia, serif; font-size: .92em; font-weight: 500; letter-spacing: .015em; line-height: 1; }
+.founders-heading-brand { display: inline-block; vertical-align: baseline; font-family: "Newsreader", Georgia, "Times New Roman", serif; font-size: .94em; font-weight: 500; line-height: 1; letter-spacing: -.025em; margin-right: .06em; }
+.chapter-content--founders .founders-claims { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(28px, 5vw, 90px); }
+.chapter-content--founders .founders-claims li { padding: 1.1em 0; }
+.chapter-content--founders .founders-claims li:nth-child(-n+2) { border-top: 0; }
+.chapter-content--founders .founders-claims li p { font-size: var(--chapter-body-size); line-height: 1.6; }
+.about-page-inner { width: 100%; padding-bottom: 12px; }
+.chapter-content--pink h2 { margin-bottom: .3em; }
+.chapter-content--pink .chapter-statement { margin-bottom: .6em; font-family: "SIX Noto Serif SC", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", serif; font-size: var(--chapter-subtitle-size); line-height: 1.45; }
+.chapter-content--pink .about-introduction { margin-bottom: 1.5em; font-size: var(--chapter-body-size); }
+.chapter-content--pink p { line-height: 2.5; }
+.founders-inline { border-top: 1px solid currentColor; border-bottom: 1px solid currentColor; padding: clamp(16px, 1.6vw, 24px) 0; }
+.founders-inline-header { display: grid; grid-template-columns: clamp(74px, 8vw, 116px) minmax(0, 1fr); align-items: center; gap: clamp(16px, 1.6vw, 24px); }
+.founders-count { border-right: 1px solid currentColor; font: 500 clamp(66px, 7vw, 104px)/.8 "Newsreader", Georgia, serif; letter-spacing: -.075em; }
+.founders-inline-heading { min-width: 0; }
+.chapter-content .founders-inline-heading h3 { margin: .1em 0 .1em; font-size: clamp(22px, 1.85vw, 28px); }
+.chapter-content .founders-inline-heading p { margin: 0; font-size: 13px; }
+.founders-claims { margin: 0; padding: 0; list-style: none; }
+.founders-claims li { display: block; min-width: 0; padding: .4em 0; border-top: 1px solid rgb(50 27 39 / 30%); }
+.founder-claim {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(3em, auto) minmax(0, 1fr);
+  gap: clamp(24px, 3vw, 48px);
+  align-items: start;
+  width: 100%;
+  padding: .65em .35em;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.founder-claim::before {
+  position: absolute;
+  z-index: -1;
+  inset: -2px -10px;
+  content: "";
+  background: #bd91a5 url('/media/pink-texture.webp') center / cover;
+  opacity: 0;
+  transform: scale(.96) rotate(-.5deg);
+  transition: opacity 220ms ease, transform 260ms ease;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 52%, transparent 78%);
+  mask-image: radial-gradient(ellipse at center, #000 52%, transparent 78%);
+  mix-blend-mode: multiply;
+}
+.founder-claim:hover::before, .founder-claim:focus-visible::before, .founder-claim.is-active::before { opacity: .2; transform: scale(1) rotate(0); }
+.founder-claim:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
+.founder-claim > span { font: 500 clamp(48px, 5vw, 76px)/.92 "Newsreader", Georgia, serif; }
+.founder-claim > p { position: relative; z-index: 1; margin: 0; line-height: 1.65; }
+.chapter-content .founders-claims li p { margin: 0; line-height: 1.65; }
+.about-closing { padding-top: 1.7em; }
+.chapter-content .about-closing p { margin-bottom: 1.1em; font-family: inherit; font-size: var(--chapter-body-size); font-weight: 400; }
+.join-contribution-amount { font: 500 clamp(28px, 2.7vw, 42px)/1.2 "Newsreader", Georgia, serif; letter-spacing: -.025em; }
+.chapter-content--yellow { top: 16%; right: 4%; width: min(39vw, 600px); }
 .chapter-content--yellow h3 { border-top: 1px solid currentColor; padding-top: 1em; }
 .work-principles { margin: 0; padding: 0; list-style: none; }
 .work-principles li { margin: 0 0 1em; }
-.work-principles strong { font-family: "SIX Noto Serif SC", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", "SimSun", serif; font-size: clamp(20px, 1.8vw, 29px); font-weight: 500; }
+.work-principles strong { font-family: "SIX Noto Serif SC", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", "SimSun", serif; font-size: var(--chapter-subtitle-size); font-weight: 500; }
 .work-principles p { margin: .25em 0 0; }
 .chapter-content--beige {
   top: 10%; left: 4%; width: 92%;
-  display: grid; grid-template-columns: 31% 31%; justify-content: space-between; column-gap: 36%;
+  display: grid; grid-template-columns: minmax(0, 36%) minmax(0, 31%); justify-content: space-between; column-gap: 0;
 }
 .chapter-content--beige h2 { grid-column: 1 / -1; }
-.chapter-content--beige h3 { margin-top: .65em; }
+.chapter-content--beige h3 { margin-top: .65em; text-wrap: balance; }
+.join-heading-keep { display: inline-block; white-space: nowrap; }
 .join-path a { color: inherit; font-size: clamp(15px, 1.2vw, 19px); text-underline-offset: .2em; }
 .join-contact a { display: inline-flex; align-items: center; gap: .5em; color: inherit; border-bottom: 1px solid currentColor; padding-bottom: 3px; text-decoration: none; font-size: clamp(15px, 1.2vw, 19px); }
 .join-email-icon { display: block; width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 
 .scroll-cue {
   position: absolute;
-  z-index: 8;
+  z-index: 20;
   right: 4%;
   bottom: 4%;
   display: flex;
@@ -331,8 +449,14 @@ body { overflow: hidden; }
   animation: beige-content-exit 0.7s linear forwards;
 }
 .scene--pink .figure-leaning { z-index: 0 !important; }
+.scene--founders .figure-leaning { z-index: 0 !important; }
+.scene--founders .sequence-editor-layer.home-exit-down { animation: founders-figure-exit 1.65s cubic-bezier(.22,.72,.2,1) forwards; }
 .third-walker-enter { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .third-walker-enter .figure-sequence-walker { z-index: 2; }
+
+@keyframes founders-figure-exit {
+  to { transform: translateY(110svh); }
+}
 
 @keyframes beige-content-exit {
   to { transform: translateY(110svh); }
@@ -362,16 +486,16 @@ body { overflow: hidden; }
 @media (max-width: 700px) {
   .language-switcher { top: 3%; right: 6%; font-size: 11px; }
   .scene--home .headline { transform: none !important; z-index: 6 !important; }
-  .brand-wordmark { left: 6%; top: 4%; font-size: clamp(68px, 23vw, 96px); }
-  .headline-title { left: 6%; top: 16%; width: 88%; font-size: clamp(30px, 8vw, 38px); line-height: 1.28; }
+  .brand-wordmark { left: 6%; top: 4%; font-size: clamp(54px, calc(var(--editor-title-size, 155px) * .6), 110px); }
+  .headline-title { left: 6%; top: 16%; width: 88%; font-size: clamp(24px, calc(var(--editor-subtitle-size, 74px) * .52), 42px); line-height: 1.28; }
   .headline-title span:last-child { font-size: inherit; }
   .scene--english .headline-title {
     top: 17%;
     width: 88%;
-    font-size: clamp(28px, 7.1vw, 37px);
+    font-size: clamp(24px, calc(var(--editor-subtitle-size, 66px) * .52), 40px);
     line-height: 1.2;
   }
-  .learn-more { left: 6%; top: 33%; min-width: 0; padding: 10px 22px; font-size: 17px; }
+  .learn-more { left: 6%; top: 33%; min-width: 0; padding: 10px 22px; font-size: clamp(12px, calc(var(--editor-body-size, 22px) * .8), 30px); }
 
   .scene:not(.scene--beige) .figure-leaning {
     inset: auto !important;
@@ -387,12 +511,15 @@ body { overflow: hidden; }
   .figure-hit-left { left: 0; top: 59%; width: 50%; height: 37%; }
   .figure-hit-middle { left: 45%; top: 43%; width: 55%; height: 52%; }
   .figure-hit-right { display: none; }
-  .figure-caption { font-size: 13px; padding: .45em .25em; }
+  .figure-caption { font-size: 14px; padding: .45em .25em; }
   .scene--english .figure-caption { font-size: 12px; }
   .figure-caption-left { left: 6%; top: 62%; bottom: auto; }
   .figure-caption-middle { left: 54%; top: 45%; }
 
   .chapter-content {
+    --chapter-title-size: clamp(24px, calc(var(--editor-title-size, 52px) * .72), 44px);
+    --chapter-subtitle-size: clamp(18px, calc(var(--editor-subtitle-size, 30px) * .78), 28px);
+    --chapter-body-size: clamp(12px, calc(var(--editor-body-size, 20px) * .78), 19px);
     top: 4svh;
     left: 6%;
     right: 6%;
@@ -402,20 +529,44 @@ body { overflow: hidden; }
     background: transparent;
     touch-action: pan-y;
   }
-  .chapter-content--pink { top: clamp(54px, 10svh, 90px); max-height: 49svh; }
+  .chapter-content--pink { top: 4svh; left: 6%; right: 6%; width: 88%; height: 92svh; max-height: 92svh; min-height: 0; padding: 0; }
+  .chapter-content--founders { top: 0; left: 0; right: 0; width: 100%; max-height: 100svh; padding: 7svh 7% 6svh; }
+  .founders-page-inner { padding-right: 10vw; }
+  .founders-yellow-edge { width: 13vw; }
+  .founders-tree-crop { bottom: 0; width: min(78vw, 370px); height: 35svh; }
+  .chapter-content--founders .founders-claims { display: block; }
+  .chapter-content--founders .founders-claims li { padding: 1em 0; }
+  .chapter-content--founders .founders-claims li:nth-child(2) { border-top: 1px solid rgb(50 27 39 / 30%); }
+  .chapter-content--founders .founders-claims li p { line-height: 1.6; }
+  .founder-claim { grid-template-columns: minmax(2.8em, auto) minmax(0, 1fr); gap: 1.1em; padding: .55em .2em; }
+  .founder-claim > span { font-size: clamp(42px, 11vw, 54px); }
   .chapter-content--yellow { top: clamp(64px, 12svh, 112px); max-height: 42svh; }
   .chapter-content--beige { display: block; top: 6svh; max-height: 51svh; }
-  .chapter-content h2 { font-size: 24px; margin-bottom: .35em; }
-  .chapter-content h3 { font-size: 17px; margin: .8em 0 .25em; }
-  .chapter-content p, .join-path a { font-size: clamp(12px, min(3.4vw, 1.65svh), 14px); line-height: 1.55; }
+  .chapter-content h2 { margin-bottom: .35em; }
+  .chapter-content--founders h2 { gap: .18em; }
+  .chapter-content--founders .about-next-cue { right: auto; left: 7%; bottom: max(3svh, env(safe-area-inset-bottom)); }
+  .chapter-content h3 { margin: .8em 0 .25em; }
+  .chapter-content p, .join-path a { line-height: 1.55; }
   .chapter-content p { margin-bottom: .55em; }
-  .chapter-content--pink h2, .chapter-content--yellow h2 { font-size: 27px; }
-  .chapter-content--pink p, .chapter-content--yellow p { font-size: clamp(13px, min(3.8vw, 1.9svh), 16px); line-height: 1.6; }
+  .chapter-content--pink p { line-height: 2.5; }
+  .chapter-content--yellow p { line-height: 1.6; }
   .chapter-content--pink p { margin-bottom: .65em; }
+  .chapter-content--pink .about-introduction { line-height: 1.7; margin-bottom: 1.4em; }
+  .founders-inline { padding: 22px 0; }
+  .founders-inline-header { grid-template-columns: 67px minmax(0, 1fr); gap: 14px; }
+  .founders-count { font-size: 60px; }
+  .chapter-content .founders-inline-heading h3 { font-size: 20px; }
+  .chapter-content .founders-inline-heading p { font-size: 12px; }
+  .founders-claims { grid-template-columns: 1fr; }
+  .founders-claims li { grid-template-columns: 2.5em minmax(0, 1fr); gap: .7em; padding: .9em 0; }
+  .founders-claims li > span { font-size: 25px; }
+  .chapter-content .founders-claims li p { line-height: 1.65; }
+  .chapter-content .about-closing p { font-size: 16px; line-height: 1.8; }
+  .about-closing p:nth-child(2) { font-size: 23px !important; }
+  .join-contribution-amount { font-size: 28px !important; }
   .work-principles li { margin-bottom: .5em; }
-  .work-principles strong { font-size: 19px; }
-  .chapter-content--beige h3 { font-size: 18px; margin: .9em 0 .35em; }
-  .chapter-content--beige p { font-size: clamp(13px, min(3.7vw, 1.85svh), 15px); line-height: 1.72; margin-bottom: .85em; }
+  .chapter-content--beige h3 { margin: .9em 0 .35em; }
+  .chapter-content--beige p { line-height: 1.72; margin-bottom: .85em; }
   .join-contact { margin: .35em 0 .7em; }
   .join-contact a { font-size: 15px; }
   .scroll-cue { right: 5%; bottom: 3%; font-size: 13px; }

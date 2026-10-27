@@ -2,6 +2,8 @@ export const EDITOR_STORAGE_KEY = 'six-homepage-visual-editor-v2';
 
 export const LAYER_IDS = [
   'background', 'leftFigure', 'centerFigure', 'rightFigure', 'pinkReveal', 'headline',
+  'pinkFigure', 'pinkContent', 'foundersLandscape', 'foundersContent',
+  'yellowFigure', 'yellowContent', 'beigeFigure', 'beigeContent',
 ] as const;
 export type LayerId = typeof LAYER_IDS[number];
 
@@ -21,14 +23,24 @@ export interface HomeText {
   button: string;
 }
 
+export interface PageTypography {
+  title: number;
+  subtitle: number;
+  body: number;
+}
+
 export interface EditorConfig {
   layers: Record<LayerId, LayerTransform>;
   text: HomeText;
+  pageText: Record<string, string>;
+  pageTypography: Record<string, Partial<PageTypography>>;
 }
 
 export type EditorConfigOverrides = {
   layers?: Partial<Record<LayerId, Partial<LayerTransform>>>;
   text?: Partial<HomeText>;
+  pageText?: Record<string, string>;
+  pageTypography?: Record<string, Partial<PageTypography>>;
 };
 
 export interface StorageLike {
@@ -45,6 +57,14 @@ export const DEFAULT_EDITOR_CONFIG: EditorConfig = {
     rightFigure: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 1 },
     pinkReveal: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 2 },
     headline: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 4 },
+    pinkFigure: { x: -170, y: 40, scale: 1.8, scaleX: 1, scaleY: 1, zIndex: 6 },
+    pinkContent: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 7 },
+    foundersLandscape: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 8 },
+    foundersContent: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 9 },
+    yellowFigure: { x: -115, y: -25, scale: 1.08, scaleX: 1, scaleY: 1, zIndex: 10 },
+    yellowContent: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 11 },
+    beigeFigure: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 12 },
+    beigeContent: { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, zIndex: 13 },
   },
   text: {
     eyebrow: 'SIX',
@@ -52,6 +72,8 @@ export const DEFAULT_EDITOR_CONFIG: EditorConfig = {
     description: '有想象力、有活力、有胆识的新一代创业者，\n和她们的新冒险。',
     button: '加入我们　→',
   },
+  pageText: {},
+  pageTypography: {},
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -81,7 +103,21 @@ export function resolveEditorConfig(defaults: EditorConfig, overrides: EditorCon
     const value = overrides.text?.[key];
     if (typeof value === 'string' && value.length <= 500) text[key] = value;
   }
-  return { layers, text };
+  const pageText = { ...defaults.pageText, ...overrides.pageText };
+  for (const [key, value] of Object.entries(pageText)) {
+    if (typeof value !== 'string' || value.length > 1000) delete pageText[key];
+  }
+  const pageTypography: Record<string, Partial<PageTypography>> = {};
+  for (const [page, sizes] of Object.entries({ ...defaults.pageTypography, ...overrides.pageTypography })) {
+    if (!isRecord(sizes)) continue;
+    const safe: Partial<PageTypography> = {};
+    for (const key of ['title', 'subtitle', 'body'] as const) {
+      const value = sizes[key];
+      if (typeof value === 'number' && Number.isFinite(value)) safe[key] = Math.max(12, Math.min(220, value));
+    }
+    pageTypography[page] = safe;
+  }
+  return { layers, text, pageText, pageTypography };
 }
 
 export function loadEditorConfig(storage?: StorageLike | null): EditorConfig {
@@ -119,7 +155,20 @@ export function loadEditorConfig(storage?: StorageLike | null): EditorConfig {
         }
       }
     }
-    return resolveEditorConfig(DEFAULT_EDITOR_CONFIG, { layers: layerOverrides, text: textOverrides });
+    const pageText: Record<string, string> = {};
+    if (isRecord(parsed.pageText)) {
+      for (const [key, value] of Object.entries(parsed.pageText)) if (typeof value === 'string' && value.length <= 1000) pageText[key] = value;
+    }
+    const pageTypography: Record<string, Partial<PageTypography>> = {};
+    if (isRecord(parsed.pageTypography)) {
+      for (const [page, sizes] of Object.entries(parsed.pageTypography)) {
+        if (!isRecord(sizes)) continue;
+        const safe: Partial<PageTypography> = {};
+        for (const key of ['title', 'subtitle', 'body'] as const) if (typeof sizes[key] === 'number') safe[key] = sizes[key] as number;
+        pageTypography[page] = safe;
+      }
+    }
+    return resolveEditorConfig(DEFAULT_EDITOR_CONFIG, { layers: layerOverrides, text: textOverrides, pageText, pageTypography });
   } catch {
     return resolveEditorConfig(DEFAULT_EDITOR_CONFIG);
   }

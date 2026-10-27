@@ -3,6 +3,4 @@ node_modules/
 dist/
 .DS_Store
 *.log
-/public/media/*
-!/public/media/README.md
 .vercel

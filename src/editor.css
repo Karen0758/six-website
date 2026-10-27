@@ -21,6 +21,8 @@
   height: 100vh;
   height: 100svh;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   padding: 20px;
   background: rgba(30,27,30,.97);
   color: #fff4e4;
@@ -28,6 +30,7 @@
   font: 14px/1.45 system-ui, sans-serif;
 }
 .visual-editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.visual-editor-header p { margin: 0 0 2px; color: #c7b8c1; font-size: 11px; letter-spacing: .08em; }
 .visual-editor-header h2 { font-size: 20px; margin: 0; font-weight: 600; }
 .visual-editor button, .visual-editor select, .visual-editor input, .visual-editor textarea {
   border: 1px solid #756a70;
@@ -45,6 +48,7 @@
 .editor-order > div, .editor-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .editor-order output { margin-left: auto; color: #c7b8c1; }
 .editor-divider { height: 1px; margin: 18px 0; background: #625960; }
+.editor-section-title { margin: 4px 0 8px; color: #fff4e4; font-size: 14px; font-weight: 600; }
 .editor-hint { color: #d4c4cb; font-size: 12px; }
 .editor-actions { margin: 18px 0 8px; }
 .editor-drag-target {
