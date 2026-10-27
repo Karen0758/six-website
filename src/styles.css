@@ -484,6 +484,32 @@ body { overflow: hidden; }
 }
 
 @media (max-width: 700px) {
+  /* Some iOS and WeChat WebViews map glyphs from the bundled subset fonts
+     incorrectly. Bypass both bundled Chinese families throughout Chinese pages
+     on phones and use iOS's complete system family. Keep the brand/numeric Latin
+     faces separate so SIX and the claim numbers retain their intended look. */
+  .scene:not(.scene--english) {
+    font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, "Hiragino Sans GB", sans-serif !important;
+  }
+  .scene:not(.scene--english) .headline-title,
+  .scene:not(.scene--english) .learn-more,
+  .scene:not(.scene--english) .figure-caption,
+  .scene:not(.scene--english) .chapter-content,
+  .scene:not(.scene--english) .chapter-content h2,
+  .scene:not(.scene--english) .chapter-content h3,
+  .scene:not(.scene--english) .chapter-content p,
+  .scene:not(.scene--english) .chapter-content--pink .chapter-statement,
+  .scene:not(.scene--english) .work-principles strong,
+  .scene:not(.scene--english) .scroll-cue,
+  .scene:not(.scene--english) .return-home {
+    font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, "Hiragino Sans GB", sans-serif !important;
+  }
+  .scene:not(.scene--english) .brand-wordmark,
+  .scene:not(.scene--english) .founders-heading-brand,
+  .scene:not(.scene--english) .founder-claim > span,
+  .scene:not(.scene--english) .join-contribution-amount {
+    font-family: "Newsreader", Georgia, "Times New Roman", serif !important;
+  }
   .language-switcher { top: 3%; right: 6%; font-size: 11px; }
   .scene--home .headline { transform: none !important; z-index: 6 !important; }
   .brand-wordmark { left: 6%; top: 4%; font-size: clamp(54px, calc(var(--editor-title-size, 155px) * .6), 110px); }
@@ -530,18 +556,42 @@ body { overflow: hidden; }
     touch-action: pan-y;
   }
   .chapter-content--pink { top: 4svh; left: 6%; right: 6%; width: 88%; height: 92svh; max-height: 92svh; min-height: 0; padding: 0; }
-  .chapter-content--founders { top: 0; left: 0; right: 0; width: 100%; max-height: 100svh; padding: 7svh 7% 6svh; }
-  .founders-page-inner { padding-right: 10vw; }
+  .chapter-content--founders {
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100svh;
+    max-height: none;
+    overflow: hidden;
+    padding: max(5svh, 36px) 7% max(11svh, 78px);
+  }
+  .founders-page-inner {
+    width: 84%;
+    max-width: 520px;
+    margin: 0;
+    padding-right: 0;
+  }
   .founders-yellow-edge { width: 13vw; }
-  .founders-tree-crop { bottom: 0; width: min(78vw, 370px); height: 35svh; }
+  .founders-tree-crop { bottom: 0; width: min(66vw, 330px); height: 31svh; }
   .chapter-content--founders .founders-claims { display: block; }
-  .chapter-content--founders .founders-claims li { padding: 1em 0; }
+  .chapter-content--founders .founders-claims li { padding: .42em 0; }
   .chapter-content--founders .founders-claims li:nth-child(2) { border-top: 1px solid rgb(50 27 39 / 30%); }
-  .chapter-content--founders .founders-claims li p { line-height: 1.6; }
-  .founder-claim { grid-template-columns: minmax(2.8em, auto) minmax(0, 1fr); gap: 1.1em; padding: .55em .2em; }
-  .founder-claim > span { font-size: clamp(42px, 11vw, 54px); }
+  .chapter-content--founders .founders-claims li p { font-size: clamp(11px, 3.15vw, 14px); line-height: 1.48; }
+  .chapter-content--founders h2 { margin-bottom: .22em; font-size: clamp(34px, 10.5vw, 48px); line-height: 1.18; }
+  .founder-claim { grid-template-columns: 54px minmax(0, 1fr); gap: 18px; padding: .36em .1em; }
+  .founder-claim > span { font-size: clamp(38px, 10vw, 50px); }
   .chapter-content--yellow { top: clamp(64px, 12svh, 112px); max-height: 42svh; }
-  .chapter-content--beige { display: block; top: 6svh; max-height: 51svh; }
+  .chapter-content--beige {
+    display: block;
+    top: max(4svh, 28px);
+    left: 6%;
+    right: auto;
+    width: 80%;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
   .chapter-content h2 { margin-bottom: .35em; }
   .chapter-content--founders h2 { gap: .18em; }
   .chapter-content--founders .about-next-cue { right: auto; left: 7%; bottom: max(3svh, env(safe-area-inset-bottom)); }
@@ -565,14 +615,23 @@ body { overflow: hidden; }
   .about-closing p:nth-child(2) { font-size: 23px !important; }
   .join-contribution-amount { font-size: 28px !important; }
   .work-principles li { margin-bottom: .5em; }
-  .chapter-content--beige h3 { margin: .9em 0 .35em; }
-  .chapter-content--beige p { line-height: 1.72; margin-bottom: .85em; }
-  .join-contact { margin: .35em 0 .7em; }
+  .chapter-content--beige h2 { font-size: clamp(34px, 10vw, 44px); margin-bottom: .55em; }
+  .chapter-content--beige h3 { margin: .65em 0 .25em; font-size: clamp(19px, 5.8vw, 25px); line-height: 1.38; }
+  .chapter-content--beige p { font-size: clamp(12px, 3.55vw, 16px); line-height: 1.55; margin-bottom: .55em; }
+  .join-contact { margin: .25em 0 .5em; }
   .join-contact a { font-size: 15px; }
-  .scroll-cue { right: 5%; bottom: 3%; font-size: 13px; }
+  .scroll-cue {
+    right: auto;
+    left: 50%;
+    bottom: max(2.5svh, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    font-size: 13px;
+  }
   .return-home {
+    z-index: 30;
     right: 5%;
     bottom: max(3svh, env(safe-area-inset-bottom));
+    background: #f8ead3;
     padding-inline: 12px;
   }
 }

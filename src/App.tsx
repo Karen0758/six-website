@@ -447,7 +447,7 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
       </div>
     </div>}
 
-    {scene !== 'yellow' && <div className="sequence-editor-layer home-exit-down" style={scene === 'home' ? leftFigureStyle : pinkFigureStyle}><FrameSequence clip={hero.seated} active={scene === 'pink'} stillFrame={scene === 'founders' ? hero.seated.count - 1 : undefined} mobile={mobile} language={language} /></div>}
+    {(scene === 'home' || scene === 'pink' || (scene === 'founders' && progress < 1)) && <div className="sequence-editor-layer home-exit-down" style={scene === 'home' ? leftFigureStyle : pinkFigureStyle}><FrameSequence clip={hero.seated} active={scene === 'pink'} stillFrame={scene === 'founders' ? hero.seated.count - 1 : undefined} mobile={mobile} language={language} /></div>}
     {scene === 'beige' && beigeExitComplete && <div className="third-walker-enter" style={styleFor('beigeFigure')}>
       <FrameSequence clip={hero.walkCycle} active translateX={thirdEnterMotion.enterX} mobile={mobile} language={language} />
     </div>}
