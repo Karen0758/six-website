@@ -419,7 +419,7 @@ body { overflow: hidden; }
 .chapter-content .founders-claims li p { margin: 0; line-height: 1.65; }
 .about-closing { padding-top: 0; }
 .chapter-content .about-closing p { margin-bottom: 1.1em; font-family: inherit; font-size: var(--chapter-body-size); font-weight: 400; white-space: pre-line; }
-.join-contribution-amount { font: 500 clamp(28px, 2.7vw, 42px)/1.2 "Newsreader"; letter-spacing: -.025em; }
+.join-contribution-amount { font: 400 var(--chapter-body-size)/1.75 "SIX Noto Sans SC"; letter-spacing: 0; }
 .chapter-content--yellow { top: 16%; right: 4%; width: min(39vw, 600px); }
 .chapter-content--yellow h3 { border-top: 1px solid currentColor; padding-top: 1em; }
 .work-principles { margin: 0; padding: 0; list-style: none; }
@@ -631,12 +631,34 @@ body { overflow: hidden; }
   }
   .chapter-content .about-closing p { font-size: 16px; line-height: 1.8; }
   .about-closing p:nth-child(2) { font-size: 23px !important; }
-  .join-contribution-amount { font-size: 28px !important; }
+  .join-contribution-amount { font-size: clamp(13px, 3.55vw, 16px) !important; }
   .work-principles li { margin-bottom: .5em; }
   .chapter-content--beige h2 { font-size: clamp(34px, 10vw, 44px); margin-bottom: .55em; }
   .chapter-content--beige h3 { margin: .65em 0 .25em; font-size: clamp(19px, 5.8vw, 25px); line-height: 1.38; }
-  .chapter-content--beige p { font-size: clamp(12px, 3.55vw, 16px); line-height: 1.55; margin-bottom: .55em; }
-  .join-contact { margin: .25em 0 .5em; }
+  .chapter-content--beige .join-path h3 {
+    position: relative;
+    isolation: isolate;
+    display: table;
+    max-width: 100%;
+    padding: .14em .38em .18em;
+    color: #321b27;
+  }
+  .chapter-content--beige .join-path h3::before {
+    position: absolute;
+    z-index: -1;
+    inset: -.1em -.18em;
+    content: "";
+    background: #bd91a5 url('/media/pink-texture.webp') center / cover;
+    opacity: .3;
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 52%, transparent 78%);
+    mask-image: radial-gradient(ellipse at center, #000 52%, transparent 78%);
+    mix-blend-mode: multiply;
+  }
+  .chapter-content--beige p { font-size: clamp(13px, 3.55vw, 16px); line-height: 1.75; margin-bottom: .7em; }
+  .chapter-content--beige .join-path--founder p,
+  .chapter-content--beige .join-contribution-amount,
+  .chapter-content--beige > p { line-height: 1.75; }
+  .join-contact { margin: .45em 0 .7em; }
   .join-contact a { font-size: 15px; }
   .scroll-cue {
     right: auto;

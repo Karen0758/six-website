@@ -129,7 +129,7 @@ export default function FrameSequence({ clip, active, revealProgress, revealOrig
         r={yellowRevealRadius(revealProgress, canvas.width, canvas.height, revealOrigin.x, revealOrigin.y)} />
     </clipPath></defs>}
     <g clipPath={revealProgress !== undefined ? `url(#${clipId})` : undefined} transform={`translate(${translateX} 0)`}>
-      <image href={clip.framePath(displayedFrame)} x={box.x} y={box.y} width={box.width} height={box.height} preserveAspectRatio="none" />
+      <image href={clip.framePath(displayedFrame)} x={box.x} y={box.y} width={box.width} height={box.height} preserveAspectRatio={clip === hero.walkCycle ? 'xMidYMid meet' : 'none'} />
     </g>
     {error && <title>{error}</title>}
   </svg>;

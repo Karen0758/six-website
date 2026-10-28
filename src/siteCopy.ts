@@ -36,7 +36,7 @@ const copy = {
       title: '如何加入',
       contributor: {
         heading: '如果你想成为SIX的正式会员',
-        paragraph: '10–15k CNY',
+        paragraph: '10–15k CNY，加入我们吧。',
       },
       founder: {
         heading: '如果你是需要支持的冒险家',
@@ -104,7 +104,7 @@ const copy = {
       title: 'Join Us',
       contributor: {
         heading: 'If you want to contribute to SIX (formal membership)',
-        paragraph: 'CNY 10–15k',
+        paragraph: 'CNY 10–15k to join us.',
       },
       founder: {
         heading: 'If you are an adventurer looking for support',

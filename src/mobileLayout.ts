@@ -8,5 +8,5 @@ export const mobileYellowOrigin = { x: 196, y: 490 } as const;
 export const mobileSeatedBox: Box = { x: -280, y: 276, width: 534, height: 498 };
 export const mobileStandingBox: Box = { x: -380, y: 250, width: 600, height: 560 };
 export const mobileMiddleBox: Box = { x: 20, y: 410, width: 264, height: 395 };
-export const mobileWalkerBox: Box = { x: 118, y: 548, width: 232, height: 296 };
+export const mobileWalkerBox: Box = { x: 95, y: 478, width: 280, height: 366 };
 export const mobileWalkerMotionWidth = 260;
