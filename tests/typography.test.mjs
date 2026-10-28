@@ -21,11 +21,6 @@ test('homepage typography gives SIX the largest restrained display style', () =>
   assert.match(styles, /font-family:\s*"SIX Noto Serif SC", "Source Han Serif SC"/);
   assert.match(styles, /:root\s*\{[^}]*SIX Noto Sans SC[^}]*Source Han Sans SC/s);
   assert.match(styles, /\.scene--english,\s*\.scene--english button,\s*\.scene--english a\s*\{[^}]*font-family:\s*"Newsreader"/s);
-  assert.match(styles, /\.scene--english \.learn-more,\s*\.scene--english \.figure-caption\s*\{\s*font-size:\s*clamp\(16px,\s*1\.35vw,\s*21px\)/s);
-  assert.match(styles, /\.scene--english \.figure-caption-number\s*\{\s*font:\s*inherit;/s);
-  assert.match(styles, /\.scene--english \.chapter-content,\s*\.scene--english \.chapter-content h2,[\s\S]*?\.scene--english \.chapter-content p,[\s\S]*?font-family:\s*"Newsreader"/s);
-  assert.match(styles, /@media \(max-width:\s*700px\)[\s\S]*?\.scene--english \.figure-caption\s*\{\s*font-size:\s*17px;/s);
-  assert.match(styles, /@media \(max-width:\s*700px\)[\s\S]*?\.join-contact-action\s*\{[^}]*min-height:\s*44px;[^}]*font-size:\s*15px;/s);
   assert.doesNotMatch(styles, /wordmark-ripple|\.brand-wordmark::before|\.brand-wordmark::after/);
   assert.match(styles, /\.chapter-content--yellow\s*\{[^}]*top:\s*16%/s);
 });

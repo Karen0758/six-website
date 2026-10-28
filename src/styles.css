@@ -179,19 +179,16 @@ body { overflow: hidden; }
   font-family: "Newsreader", Georgia, "Times New Roman", serif;
   letter-spacing: .015em;
 }
-.scene--english .learn-more,
-.scene--english .figure-caption { font-size: clamp(16px, 1.35vw, 21px); }
-.scene--english .figure-caption-number { font: inherit; letter-spacing: .04em; }
-.scene--english .chapter-content,
+.scene--english .learn-more { font-size: clamp(16px, 1.35vw, 21px); }
+.scene--english .figure-caption { font-size: clamp(13px, .95vw, 16px); }
 .scene--english .chapter-content h2,
 .scene--english .chapter-content h3,
-.scene--english .chapter-content p,
-.scene--english .work-principles strong,
-.scene--english .join-contact-action {
+.scene--english .work-principles strong {
   font-family: "Newsreader", Georgia, "Times New Roman", serif;
-  font-style: normal;
   letter-spacing: 0;
 }
+.scene--english .chapter-content p,
+.scene--english .join-contact-action { font-family: "Newsreader", Georgia, "Times New Roman", serif; }
 .headline p { display: none; }
 .learn-more {
   position: absolute;
@@ -419,7 +416,7 @@ body { overflow: hidden; }
   .figure-hit-middle { left: 45%; top: 43%; width: 55%; height: 52%; }
   .figure-hit-right { display: none; }
   .figure-caption { font-size: 13px; padding: .45em .25em; }
-  .scene--english .figure-caption { font-size: 17px; }
+  .scene--english .figure-caption { font-size: 12px; }
   .figure-caption-left { left: 6%; top: 62%; bottom: auto; }
   .figure-caption-middle { left: 54%; top: 45%; }
 
