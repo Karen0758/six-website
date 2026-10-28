@@ -171,7 +171,6 @@ body { overflow: hidden; }
 .scene--english button,
 .scene--english a {
   font-family: "Newsreader", Georgia, "Times New Roman", serif;
-  font-weight: 500;
 }
 .scene--english .learn-more,
 .scene--english .figure-caption,
@@ -191,7 +190,6 @@ body { overflow: hidden; }
 .scene--english .join-contact-action {
   font-family: "Newsreader", Georgia, "Times New Roman", serif;
   font-style: normal;
-  font-weight: 500;
   letter-spacing: 0;
 }
 .headline p { display: none; }
@@ -446,16 +444,6 @@ body { overflow: hidden; }
   .chapter-content--pink h2, .chapter-content--yellow h2 { font-size: 27px; }
   .chapter-content--pink p, .chapter-content--yellow p { font-size: clamp(13px, min(3.8vw, 1.9svh), 16px); line-height: 1.6; }
   .chapter-content--pink p { margin-bottom: .65em; }
-  .scene--english .chapter-content,
-  .scene--english .chapter-content h2,
-  .scene--english .chapter-content h3,
-  .scene--english .chapter-content p,
-  .scene--english .work-principles strong,
-  .scene--english .join-contact-action {
-    font-family: "Newsreader", Georgia, "Times New Roman", serif;
-    font-style: normal;
-    font-weight: 500;
-  }
   .work-principles li { margin-bottom: .5em; }
   .work-principles strong { font-size: 19px; }
   .chapter-content--beige h3 { font-size: 18px; margin: .9em 0 .35em; }
