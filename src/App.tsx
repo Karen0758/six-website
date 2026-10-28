@@ -289,6 +289,7 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
   const beigeExit = getBeigeExitMotion(progress, canvas.width, canvas.height);
   const beigeYellowX = mobile ? -canvas.width * progress : beigeExit.yellowX;
   const thirdEnterMotion = thirdFigureMotion(walkEnterProgress, canvas.width, mobile ? mobileWalkerMotionWidth : hero.walkCycle.motionWidth);
+  const thirdEnterX = thirdEnterMotion.enterX - (mobile ? canvas.width * 0.24 : 0);
   const chapterAnimationDurationMs = scene === 'pink'
     ? (hero.seated.count - 1 - hero.seated.startFrame) / hero.seated.fps * 1000
     : scene === 'founders' ? FOUNDERS_TURN_MS
@@ -462,7 +463,7 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
 
     {(scene === 'home' || scene === 'pink' || (scene === 'founders' && progress < 1)) && <div className="sequence-editor-layer home-exit-down" style={scene === 'home' ? leftFigureStyle : pinkFigureStyle}><FrameSequence clip={hero.seated} active={scene === 'pink'} stillFrame={scene === 'founders' ? hero.seated.count - 1 : undefined} mobile={mobile} language={language} /></div>}
     {scene === 'beige' && beigeExitComplete && <div className="third-walker-enter" style={styleFor('beigeFigure')}>
-      <FrameSequence clip={hero.walkCycle} active translateX={thirdEnterMotion.enterX} mobile={mobile} language={language} />
+      <FrameSequence clip={hero.walkCycle} active translateX={thirdEnterX} mobile={mobile} language={language} />
     </div>}
     {isChapterContentReady(scene, progress) && <ChapterContent scene={scene} animationDurationMs={chapterAnimationDurationMs} language={language} editorStyle={chapterStyle} pageText={visual.pageText} />}
     {(scene === 'pink' || scene === 'founders' || scene === 'yellow') && progress >= 1 && <button className="scroll-cue" type="button" onClick={requestScrollAdvance} aria-label={copy.ui.scrollAria}>

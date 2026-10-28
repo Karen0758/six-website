@@ -646,18 +646,19 @@ body { overflow: hidden; }
   .chapter-content--beige .join-path h3::before {
     position: absolute;
     z-index: -1;
-    inset: -.1em -.18em;
+    inset: -2px -10px;
     content: "";
     background: #bd91a5 url('/media/pink-texture.webp') center / cover;
-    opacity: .3;
+    opacity: .2;
+    transform: scale(.96) rotate(-.5deg);
     -webkit-mask-image: radial-gradient(ellipse at center, #000 52%, transparent 78%);
     mask-image: radial-gradient(ellipse at center, #000 52%, transparent 78%);
     mix-blend-mode: multiply;
   }
-  .chapter-content--beige p { font-size: clamp(13px, 3.55vw, 16px); line-height: 1.75; margin-bottom: .7em; }
+  .chapter-content--beige p { font-size: clamp(13px, 3.55vw, 16px); line-height: 1.95; margin-bottom: .7em; }
   .chapter-content--beige .join-path--founder p,
   .chapter-content--beige .join-contribution-amount,
-  .chapter-content--beige > p { line-height: 1.75; }
+  .chapter-content--beige > p { line-height: 1.95; }
   .join-contact { margin: .45em 0 .7em; }
   .join-contact a { font-size: 15px; }
   .scroll-cue {
