@@ -27,7 +27,7 @@
   background: rgba(30,27,30,.97);
   color: #fff4e4;
   box-shadow: -12px 0 38px rgba(0,0,0,.3);
-  font: 14px/1.45 system-ui, sans-serif;
+  font: 14px/1.45 "SIX Noto Sans SC";
 }
 .visual-editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
 .visual-editor-header p { margin: 0 0 2px; color: #c7b8c1; font-size: 11px; letter-spacing: .08em; }
