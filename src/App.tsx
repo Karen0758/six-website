@@ -43,6 +43,7 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
   const [progress, setProgress] = useState(0);
   const [beigeExitComplete, setBeigeExitComplete] = useState(false);
   const [walkEnterProgress, setWalkEnterProgress] = useState(0);
+  const [birdFlying, setBirdFlying] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const raf = useRef(0);
@@ -125,6 +126,7 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
     if (transitioningRef.current) return;
     const clip = nextScene === 'pink' ? hero.seated : nextScene === 'yellow' ? hero.middle : nextScene === 'beige' ? hero.walkCycle : null;
     sceneRef.current = nextScene;
+    setBirdFlying(false);
     setBeigeExitComplete(false);
     setWalkEnterProgress(0);
     setError('');
@@ -167,6 +169,7 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
     if (transitioningRef.current) return;
     sceneRef.current = 'home';
     setScene('home');
+    setBirdFlying(false);
     setProgress(0);
     setBeigeExitComplete(false);
     setWalkEnterProgress(0);
@@ -428,9 +431,19 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
         <defs><clipPath id="founders-ivory-wave-clip" clipPathUnits="userSpaceOnUse"><path d={foundersIvoryWavePath(progress, canvas.width, canvas.height)} /></clipPath></defs>
         <image href={hero.thirdBackground} x="0" y="0" width={canvas.width} height={canvas.height} preserveAspectRatio={mobile ? 'xMidYMid slice' : 'none'} clipPath="url(#founders-ivory-wave-clip)" />
       </svg>
-      <div className="founders-landscape" aria-hidden="true" style={styleFor('foundersLandscape')}>
+      <div className="founders-landscape" style={styleFor('foundersLandscape')}>
         <div className="founders-yellow-edge" style={{ opacity: foundersYellowProgress, transform: `translateX(${(1 - foundersYellowProgress) * 18}%)` }} />
-        <div className="founders-tree-crop" style={{ opacity: foundersTreesProgress, transform: `translateY(${(1 - foundersTreesProgress) * 3}%)` }}><img src="./media/founders-cypress.png" alt="" /></div>
+        <button
+          type="button"
+          className={`founders-tree-crop${birdFlying ? ' is-bird-flying' : ''}`}
+          style={{ opacity: foundersTreesProgress, transform: `translateY(${(1 - foundersTreesProgress) * 3}%)` }}
+          aria-label={language === 'en' ? 'Click the cypress grove to release a bird' : '点击树丛，唤出小鸟'}
+          aria-pressed={birdFlying}
+          onClick={() => setBirdFlying(true)}
+        >
+          <img className="founders-cypress-image" src="./media/founders-cypress.png" alt="" />
+          <img className="founders-bird" src="./media/founders-bird.webp" alt="" onAnimationEnd={() => setBirdFlying(false)} />
+        </button>
       </div>
     </>}
 
