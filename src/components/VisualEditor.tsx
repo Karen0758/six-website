@@ -138,6 +138,12 @@ export default function VisualEditor({ open, config, onChange, onReset, onExport
       <label className="editor-field">{showHomeText ? '品牌名' : '大标题'}<input aria-label="大标题字号" type="number" min={12} max={220} step={1} value={typography.title} onChange={event => onTypographyChange('title', Number(event.target.value))} /></label>
       <label className="editor-field">{showHomeText ? '首页主标题' : '小标题'}<input aria-label="小标题字号" type="number" min={12} max={120} step={1} value={typography.subtitle} onChange={event => onTypographyChange('subtitle', Number(event.target.value))} /></label>
       <label className="editor-field">{showHomeText ? '按钮文字' : '正文'}<input aria-label="正文字号" type="number" min={12} max={72} step={1} value={typography.body} onChange={event => onTypographyChange('body', Number(event.target.value))} /></label>
+      <div className="editor-field">
+        <span>行间距</span>
+        <div className="editor-line-height-options" role="group" aria-label="行间距快捷设置">
+          {[['紧凑', 1.5], ['标准', 1.75], ['舒展', 2], ['更松', 2.25]].map(([label, value]) => <button key={value} type="button" aria-pressed={typography.lineHeight === value} className={typography.lineHeight === value ? 'is-selected' : ''} onClick={() => onTypographyChange('lineHeight', value as number)}>{label as string}</button>)}
+        </div>
+      </div>
       <p className="editor-hint">当前只显示本页图层。拖动画布选中框调整位置；人物可分别设置横向、纵向拉伸。</p>
       <div className="editor-actions"><button type="button" onClick={onReset}>恢复默认</button><button type="button" onClick={onExport}>导出 JSON</button></div>
     </aside>}

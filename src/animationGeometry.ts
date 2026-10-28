@@ -10,6 +10,7 @@ export function pinkWavePath(progress: number): string {
 
 export function foundersIvoryWavePath(progress: number, width: number, height: number): string {
   const p = Math.max(0, Math.min(1, progress));
+  if (p === 0) return `M ${width + 1} 0 H ${width + 1} V ${height} H ${width + 1} Z`;
   const eased = p * p * (3 - 2 * p);
   const travel = (1 - eased) * width * 1.24;
   const topX = travel - width * 0.06;

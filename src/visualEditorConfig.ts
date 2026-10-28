@@ -27,6 +27,7 @@ export interface PageTypography {
   title: number;
   subtitle: number;
   body: number;
+  lineHeight: number;
 }
 
 export interface EditorConfig {
@@ -115,6 +116,8 @@ export function resolveEditorConfig(defaults: EditorConfig, overrides: EditorCon
       const value = sizes[key];
       if (typeof value === 'number' && Number.isFinite(value)) safe[key] = Math.max(12, Math.min(220, value));
     }
+    const lineHeight = sizes.lineHeight;
+    if (typeof lineHeight === 'number' && Number.isFinite(lineHeight)) safe.lineHeight = Math.max(1.2, Math.min(3, lineHeight));
     pageTypography[page] = safe;
   }
   return { layers, text, pageText, pageTypography };
@@ -165,6 +168,7 @@ export function loadEditorConfig(storage?: StorageLike | null): EditorConfig {
         if (!isRecord(sizes)) continue;
         const safe: Partial<PageTypography> = {};
         for (const key of ['title', 'subtitle', 'body'] as const) if (typeof sizes[key] === 'number') safe[key] = sizes[key] as number;
+        if (typeof sizes.lineHeight === 'number') safe.lineHeight = sizes.lineHeight;
         pageTypography[page] = safe;
       }
     }

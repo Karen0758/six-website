@@ -15,7 +15,8 @@ if (import.meta.env.DEV && typeof window !== 'undefined') void import('./editor.
 
 type Scene = 'home' | 'pink' | 'founders' | 'yellow' | 'beige';
 const PINK_WIPE_MS = 1200;
-const FOUNDERS_TURN_MS = 1650;
+const FOUNDERS_FIGURE_EXIT_MS = 550;
+const FOUNDERS_TURN_MS = 1550;
 const YELLOW_WIPE_MS = 1500;
 const BEIGE_TRANSITION_MS = 700;
 const BEIGE_WALK_ENTER_MS = 2500;
@@ -284,8 +285,9 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
     ? { x: mobileYellowOrigin.x / mobileCanvas.width * viewportSize.width, y: mobileYellowOrigin.y / mobileCanvas.height * viewportSize.height }
     : { x: viewportSize.width * 0.2, y: viewportSize.height / 2 };
   const yellowMaskRadius = yellowRevealRadius(progress, viewportSize.width, viewportSize.height, yellowMaskOrigin.x, yellowMaskOrigin.y);
-  const foundersYellowProgress = Math.max(0, Math.min(1, (progress - 0.3) / 0.7));
-  const foundersTreesProgress = Math.max(0, Math.min(1, (progress - 0.48) / 0.52));
+  const foundersWaveProgress = Math.max(0, Math.min(1, (progress - FOUNDERS_FIGURE_EXIT_MS / FOUNDERS_TURN_MS) / (1 - FOUNDERS_FIGURE_EXIT_MS / FOUNDERS_TURN_MS)));
+  const foundersYellowProgress = Math.max(0, Math.min(1, (foundersWaveProgress - 0.3) / 0.7));
+  const foundersTreesProgress = Math.max(0, Math.min(1, (foundersWaveProgress - 0.48) / 0.52));
   const beigeExit = getBeigeExitMotion(progress, canvas.width, canvas.height);
   const beigeYellowX = mobile ? -canvas.width * progress : beigeExit.yellowX;
   const thirdEnterMotion = thirdFigureMotion(walkEnterProgress, canvas.width, mobile ? mobileWalkerMotionWidth : hero.walkCycle.motionWidth);
@@ -357,13 +359,14 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
   }
   const typographyKey = `${language}.${scene}`;
   const defaultTypography: PageTypography = scene === 'home'
-    ? { title: 155, subtitle: 74, body: 22 }
-    : { title: 52, subtitle: 30, body: 20 };
+    ? { title: 155, subtitle: 74, body: 22, lineHeight: language === 'en' ? 1.18 : 1.45 }
+    : { title: 52, subtitle: 30, body: 20, lineHeight: scene === 'pink' ? mobile ? 1.8 : 2.5 : scene === 'founders' ? mobile ? 1.48 : 1.65 : scene === 'yellow' ? mobile ? 1.6 : 1.75 : mobile ? 1.95 : 1.75 };
   const typography = { ...defaultTypography, ...visual.pageTypography[typographyKey] };
   const editorTypographyStyle = {
     '--editor-title-size': `${typography.title}px`,
     '--editor-subtitle-size': `${typography.subtitle}px`,
     '--editor-body-size': `${typography.body}px`,
+    '--editor-line-height': `${typography.lineHeight}`,
   } as CSSProperties;
   const chapterEditorStyle = scene === 'pink' ? styleFor('pinkContent')
     : scene === 'founders' ? styleFor('foundersContent')
@@ -429,7 +432,7 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
 
     {scene === 'founders' && <>
       <svg className="founders-paper-wave" viewBox={`0 0 ${canvas.width} ${canvas.height}`} preserveAspectRatio="none" aria-hidden="true">
-        <defs><clipPath id="founders-ivory-wave-clip" clipPathUnits="userSpaceOnUse"><path d={foundersIvoryWavePath(progress, canvas.width, canvas.height)} /></clipPath></defs>
+        <defs><clipPath id="founders-ivory-wave-clip" clipPathUnits="userSpaceOnUse"><path d={foundersIvoryWavePath(foundersWaveProgress, canvas.width, canvas.height)} /></clipPath></defs>
         <image href={hero.thirdBackground} x="0" y="0" width={canvas.width} height={canvas.height} preserveAspectRatio={mobile ? 'xMidYMid slice' : 'none'} clipPath="url(#founders-ivory-wave-clip)" />
       </svg>
       <div className="founders-landscape" style={styleFor('foundersLandscape')}>
@@ -504,7 +507,7 @@ export default function App({ initialConfig }: { initialConfig?: EditorConfig } 
         onClick={() => void begin(sceneForHomeEntry('thirdRegion'))}
         aria-label={copy.ui.thirdFigure} style={styleFor('rightFigure')} />
     </>}
-    {import.meta.env.DEV && <VisualEditor open={editorOpen} config={visual} onChange={updateEditorConfig} onReset={restoreEditorDefaults} onExport={downloadEditorConfig} onToggle={() => setEditorOpen(value => !value)} dragStyles={editorDragStyles} layerIds={editorLayersByScene[scene]} pageName={editorPageNames[scene]} pageId={scene} onPageChange={page => { if (page === scene) return; if (page === 'home') returnHome(); else void begin(page); }} textFields={editorTextFields} onPageTextChange={(key, value) => updateEditorConfig({ ...visual, pageText: { ...visual.pageText, [key]: value.slice(0, 1000) } })} typography={typography} onTypographyChange={(key, value) => { if (!Number.isFinite(value)) return; updateEditorConfig({ ...visual, pageTypography: { ...visual.pageTypography, [typographyKey]: { ...typography, [key]: Math.max(12, Math.min(220, value)) } } }); }} showHomeText={scene === 'home'} />}
+    {import.meta.env.DEV && <VisualEditor open={editorOpen} config={visual} onChange={updateEditorConfig} onReset={restoreEditorDefaults} onExport={downloadEditorConfig} onToggle={() => setEditorOpen(value => !value)} dragStyles={editorDragStyles} layerIds={editorLayersByScene[scene]} pageName={editorPageNames[scene]} pageId={scene} onPageChange={page => { if (page === scene) return; if (page === 'home') returnHome(); else void begin(page); }} textFields={editorTextFields} onPageTextChange={(key, value) => updateEditorConfig({ ...visual, pageText: { ...visual.pageText, [key]: value.slice(0, 1000) } })} typography={typography} onTypographyChange={(key, value) => { if (!Number.isFinite(value)) return; const boundedValue = key === 'lineHeight' ? Math.max(1.2, Math.min(3, value)) : Math.max(12, Math.min(220, value)); updateEditorConfig({ ...visual, pageTypography: { ...visual.pageTypography, [typographyKey]: { ...typography, [key]: boundedValue } } }); }} showHomeText={scene === 'home'} />}
     {loading && scene === 'home' && <div className="loading-note" role="status">{copy.ui.loading}</div>}
     {error && <div className="error-note" role="alert">{error}</div>}
   </main>;
