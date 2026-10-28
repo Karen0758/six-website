@@ -25,7 +25,7 @@ test('each animation chapter displays the local 10/25 draft with Chinese punctua
     assert.ok(!work.includes('我们的 Portfolio'));
 
     const join = render('beige');
-    for (const phrase of ['如果你是想加入 SIX 的贡献者（正式会员）', '10–15k CNY', '如果你是需要支持的冒险家——', '含 Pre-Seed Fund', 'xiaozhege@six.com', '北京、上海、香港、多伦多、纽约、密特罗尼西亚']) assert.ok(join.includes(phrase), `missing draft text: ${phrase}`);
+    for (const phrase of ['如果你是想加入 SIX 的贡献者（正式会员）', '10–15k CNY', '如果你是需要支持的冒险家——', '含 Pre-Seed Fund', 'helloworld@sixfund.org', '北京、上海、香港、多伦多、纽约、密特罗尼西亚']) assert.ok(join.includes(phrase), `missing draft text: ${phrase}`);
   } finally {
     await vite.close();
   }
@@ -64,8 +64,12 @@ test('English chapters render English copy and email controls', async () => {
     assert.ok(work.includes('Judgment'));
     const join = render('beige');
     assert.ok(join.includes('Join Us'));
-    assert.ok(join.includes('Email us'));
-    assert.ok(join.includes('Send an email to xiaozhege@six.com'));
+    assert.ok(join.includes('Email Us'));
+    assert.ok(join.includes('Copy Email'));
+    assert.ok(join.includes('Send an email to helloworld@sixfund.org'));
+    assert.ok(join.includes('Copy email address: helloworld@sixfund.org'));
+    assert.match(join, /href="mailto:helloworld@sixfund\.org"/);
+    assert.match(join, /<button[^>]*class="join-contact-action join-contact-action--copy"[^>]*type="button"/);
     assert.ok(!/[\u3400-\u9fff]/.test(about + founders + work + join), 'English chapters should contain no Chinese text');
   } finally {
     await vite.close();

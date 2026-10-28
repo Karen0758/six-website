@@ -2,8 +2,27 @@ import { useEffect, useState, type CSSProperties } from 'react';
 import { getSiteCopy, type Language } from '../siteCopy';
 import { staggeredRevealDelays, type ChapterScene } from '../chapterContentTiming';
 
+async function copyText(value: string) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value);
+    return;
+  }
+
+  const input = document.createElement('textarea');
+  input.value = value;
+  input.setAttribute('readonly', '');
+  input.style.position = 'fixed';
+  input.style.opacity = '0';
+  document.body.appendChild(input);
+  input.select();
+  const copied = document.execCommand('copy');
+  input.remove();
+  if (!copied) throw new Error('Could not copy email address');
+}
+
 export default function ChapterContent({ scene, animationDurationMs, language = 'cn', editorStyle, pageText = {} }: { scene: ChapterScene | null; animationDurationMs: number; language?: Language; editorStyle?: CSSProperties; pageText?: Record<string, string> }) {
   const [activeFounder, setActiveFounder] = useState<number | null>(null);
+  const [emailCopied, setEmailCopied] = useState(false);
   useEffect(() => {
     if (scene !== 'founders') { setActiveFounder(null); return; }
     const chapter = document.querySelector<HTMLElement>('.chapter-content--founders');
@@ -77,6 +96,16 @@ export default function ChapterContent({ scene, animationDurationMs, language = 
   const delays = staggeredRevealDelays(7, animationDurationMs);
   const contributorHeading = text('contributorHeading', siteCopy.join.contributor.heading).replace(/\s+/g, ' ');
   const contributorHeadingParts = contributorHeading.split(/(SIX的|SIX|成为|正式会员|正式成员)/g);
+  const contactEmail = text('email', siteCopy.join.email);
+  async function handleCopyEmail() {
+    try {
+      await copyText(contactEmail);
+      setEmailCopied(true);
+      window.setTimeout(() => setEmailCopied(false), 1800);
+    } catch {
+      setEmailCopied(false);
+    }
+  }
   return <section className="chapter-content chapter-content--beige" aria-labelledby="chapter-join-title" tabIndex={0} style={editorStyle}>
     <h2 id="chapter-join-title" className="chapter-reveal" style={{ animationDelay: `${delays[0]}ms` }}>{text('title', siteCopy.join.title)}</h2>
     <div className="join-path join-path--contributor">
@@ -88,10 +117,14 @@ export default function ChapterContent({ scene, animationDurationMs, language = 
       <p className="chapter-reveal" style={{ animationDelay: `${delays[4]}ms` }}>{text('founderParagraph', siteCopy.join.founder.paragraph)}</p>
     </div>
     <div className="join-contact chapter-reveal" style={{ animationDelay: `${delays[5]}ms` }}>
-      <a href={`mailto:${text('email', siteCopy.join.email)}`} aria-label={`${siteCopy.ui.emailAria} ${text('email', siteCopy.join.email)}`}>
-        <svg className="join-email-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.5" /><path d="m4 7 8 6 8-6" /></svg>
+      <a className="join-contact-action join-contact-action--email" href={`mailto:${contactEmail}`} aria-label={`${siteCopy.ui.emailAria} ${contactEmail}`}>
         <span className="join-email-action">{siteCopy.ui.email}</span>
+        <svg className="join-action-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
       </a>
+      <button className="join-contact-action join-contact-action--copy" type="button" onClick={handleCopyEmail} aria-label={`${siteCopy.ui.copyEmailAria}: ${contactEmail}`}>
+        <svg className="join-copy-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="3" width="11" height="13" rx="2" /><rect x="3" y="8" width="11" height="13" rx="2" /></svg>
+        <span aria-live="polite">{emailCopied ? siteCopy.ui.emailCopied : siteCopy.ui.copyEmail}</span>
+      </button>
     </div>
     <p className="chapter-reveal" style={{ animationDelay: `${delays[6]}ms` }}>{text('locations', siteCopy.join.locations)}</p>
   </section>;

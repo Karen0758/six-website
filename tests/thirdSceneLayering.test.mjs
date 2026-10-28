@@ -60,3 +60,8 @@ test('yellow transition reveals a full-screen radial background above the pink w
   assert.match(styles, /\.yellow-reveal\s*\{[^}]*z-index:\s*3/s, 'shared background and figure mask stay above the pink paper');
   assert.match(config, /count: 20, fps: 12, box: \{ x: 560, y: 320, width: 364, height: 545 \}/);
 });
+
+test('yellow chapter scroll cue sits below the figure shoes on desktop and mobile', () => {
+  assert.match(styles, /\.scene--yellow \.scroll-cue\s*\{\s*bottom:\s*1\.5%;\s*\}/);
+  assert.match(styles, /@media \(max-width:\s*700px\)[\s\S]*?\.scene--yellow \.scroll-cue\s*\{\s*bottom:\s*\.75%;\s*\}/);
+});
