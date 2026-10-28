@@ -335,7 +335,6 @@ body { overflow: hidden; }
   cursor: pointer;
 }
 .scene--pink .scroll-cue { color: #fff0da; }
-.scene--yellow .scroll-cue { bottom: 1.5%; }
 .scroll-cue svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; animation: scroll-cue-bob 1.8s ease-in-out infinite; }
 .scroll-cue:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 .return-home {
@@ -451,7 +450,6 @@ body { overflow: hidden; }
   .join-contact { gap: 9px; margin: .45em 0 .85em; }
   .join-contact-action { min-height: 44px; padding: 10px 16px; font-size: 15px; }
   .scroll-cue { right: 5%; bottom: 3%; font-size: 13px; }
-  .scene--yellow .scroll-cue { bottom: .75%; }
   .return-home {
     right: 5%;
     bottom: max(3svh, env(safe-area-inset-bottom));
