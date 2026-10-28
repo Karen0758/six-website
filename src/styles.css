@@ -179,7 +179,7 @@ body { overflow: hidden; }
   letter-spacing: .015em;
 }
 .scene--english .learn-more { font-size: clamp(16px, 1.35vw, 21px); }
-.scene--english .figure-caption { font-size: clamp(13px, .95vw, 16px); }
+.scene--english .figure-caption { font-size: clamp(16px, 1.35vw, 21px); }
 .scene--english .chapter-content h2,
 .scene--english .chapter-content h3,
 .scene--english .work-principles strong {
@@ -228,13 +228,13 @@ body { overflow: hidden; }
   border: 0;
   background: transparent;
   color: #4e1a41;
-  font: 500 clamp(14px, 1.15vw, 19px) "SIX Noto Serif SC";
-  letter-spacing: .08em;
+  font: 500 clamp(14px, var(--editor-body-size, 24px), 40px) "SIX Noto Serif SC";
+  letter-spacing: normal;
   white-space: nowrap;
   cursor: pointer;
 }
 .figure-caption-name { border-bottom: 1px solid currentColor; padding-bottom: .12em; }
-.figure-caption-number { font: 500 .88em "Newsreader"; letter-spacing: .04em; }
+.figure-caption-number { font: inherit; letter-spacing: inherit; }
 .figure-caption-arrow { width: 1em; height: 1em; align-self: center; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .figure-caption:hover .figure-caption-name { border-bottom-width: 2px; }
 .figure-caption:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
@@ -545,8 +545,8 @@ body { overflow: hidden; }
   .figure-hit-left { left: 0; top: 59%; width: 50%; height: 37%; }
   .figure-hit-middle { left: 45%; top: 43%; width: 55%; height: 52%; }
   .figure-hit-right { display: none; }
-  .figure-caption { font-size: 14px; padding: .45em .25em; }
-  .scene--english .figure-caption { font-size: 12px; }
+  .figure-caption { font-size: clamp(12px, calc(var(--editor-body-size, 22px) * .8), 30px); padding: .45em .25em; }
+  .scene--english .figure-caption { font-size: clamp(16px, 1.35vw, 21px); }
   .figure-caption-left { left: 6%; top: 62%; bottom: auto; }
   .figure-caption-middle { left: 54%; top: 45%; }
 
