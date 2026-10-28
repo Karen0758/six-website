@@ -109,7 +109,11 @@ export default function FrameSequence({ clip, active, revealProgress, revealOrig
   }, [active, clip, firstFrame]);
 
   const displayedFrame = !active && stillFrame !== undefined ? stillFrame : index;
-  const sequenceProgress = active ? Math.max(0, index - firstFrame) / Math.max(clip.count - 1 - firstFrame, 1) : stillFrame !== undefined ? 1 : 0;
+  const sequenceProgress = active
+    ? Math.max(0, index - firstFrame) / Math.max(clip.count - 1 - firstFrame, 1)
+    : stillFrame !== undefined
+      ? Math.max(0, Math.min(1, (stillFrame - firstFrame) / Math.max(clip.count - 1 - firstFrame, 1)))
+      : 0;
   const box = mobile
     ? clip === hero.seated
       ? active || stillFrame !== undefined ? interpolateBox(mobileSeatedBox, mobileStandingBox, sequenceProgress) : mobileSeatedBox
