@@ -402,6 +402,7 @@ body { overflow: hidden; }
 .chapter-content--beige h2 { grid-column: 1 / -1; }
 .chapter-content--beige h3 { margin-top: .65em; text-wrap: balance; }
 .join-heading-keep { display: inline-block; white-space: nowrap; }
+.join-heading-brand { font-family: "Newsreader"; font-weight: 500; }
 .join-path a { color: inherit; font-size: clamp(15px, 1.2vw, 19px); text-underline-offset: .2em; }
 .join-contact a { display: inline-flex; align-items: center; gap: .5em; color: inherit; border-bottom: 1px solid currentColor; padding-bottom: 3px; text-decoration: none; font-size: clamp(15px, 1.2vw, 19px); }
 .join-email-icon { display: block; width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }

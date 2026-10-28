@@ -35,11 +35,11 @@ const copy = {
     join: {
       title: '如何加入',
       contributor: {
-        heading: '如果你是想加入 SIX 的贡献者（正式会员）',
+        heading: '如果你想成为SIX的正式会员',
         paragraph: '10–15k CNY',
       },
       founder: {
-        heading: '如果你是需要支持的冒险家——',
+        heading: '如果你是需要支持的冒险家',
         paragraph: '我们给你初创期的判断力、关系、资源（含 Pre-Seed Fund）。我们随时回复你的信息。',
       },
       email: 'xiaozhege@six.com',

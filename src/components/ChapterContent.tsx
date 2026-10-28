@@ -73,11 +73,11 @@ export default function ChapterContent({ scene, animationDurationMs, language = 
 
   const delays = staggeredRevealDelays(7, animationDurationMs);
   const contributorHeading = text('contributorHeading', siteCopy.join.contributor.heading).replace(/\s+/g, ' ');
-  const contributorHeadingParts = contributorHeading.split(/(成为|正式会员|正式成员)/g);
+  const contributorHeadingParts = contributorHeading.split(/(SIX的|SIX|成为|正式会员|正式成员)/g);
   return <section className="chapter-content chapter-content--beige" aria-labelledby="chapter-join-title" tabIndex={0} style={editorStyle}>
     <h2 id="chapter-join-title" className="chapter-reveal" style={{ animationDelay: `${delays[0]}ms` }}>{text('title', siteCopy.join.title)}</h2>
     <div className="join-path join-path--contributor">
-      <h3 className="chapter-reveal" style={{ animationDelay: `${delays[1]}ms` }}>{contributorHeadingParts.map((part, index) => /^(成为|正式会员|正式成员)$/.test(part) ? <span className="join-heading-keep" key={index}>{part}</span> : part)}</h3>
+      <h3 className="chapter-reveal" style={{ animationDelay: `${delays[1]}ms` }}>{contributorHeadingParts.map((part, index) => part === 'SIX的' ? <span className="join-heading-keep" key={index}><span className="join-heading-brand">SIX</span>的</span> : part === 'SIX' ? <span className="join-heading-brand" key={index}>{part}</span> : /^(成为|正式会员|正式成员)$/.test(part) ? <span className="join-heading-keep" key={index}>{part}</span> : part)}</h3>
       <p className="join-contribution-amount chapter-reveal" style={{ animationDelay: `${delays[2]}ms` }}>{text('contributorParagraph', siteCopy.join.contributor.paragraph)}</p>
     </div>
     <div className="join-path join-path--founder">
