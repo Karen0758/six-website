@@ -55,9 +55,10 @@ test('chapter headings match their homepage entries', async () => {
     assert.match(render('yellow'), /<h2[^>]*>方法<\/h2>/);
     const join = render('beige');
     assert.match(join, /<h2[^>]*>如何加入<\/h2>/);
-    assert.match(join, /href="mailto:xiaozhege@six\.com"/);
-    assert.match(join, /class="join-email-icon"/);
+    assert.match(join, /href="mailto:helloworld@sixfund\.org"/);
+    assert.match(join, /class="join-action-arrow"/);
     assert.match(join, /class="join-email-action">发邮件<\/span>/);
+    assert.match(join, />复制邮箱<\/span>/);
   } finally {
     await vite.close();
   }

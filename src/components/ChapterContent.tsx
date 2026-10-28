@@ -1,9 +1,39 @@
+import { useState } from 'react';
 import { getSiteCopy, type Language } from '../siteCopy';
 import { staggeredRevealDelays, type ChapterScene } from '../chapterContentTiming';
 
+async function copyText(value: string) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value);
+    return;
+  }
+
+  const input = document.createElement('textarea');
+  input.value = value;
+  input.setAttribute('readonly', '');
+  input.style.position = 'fixed';
+  input.style.opacity = '0';
+  document.body.appendChild(input);
+  input.select();
+  const copied = document.execCommand('copy');
+  input.remove();
+  if (!copied) throw new Error('Could not copy email address');
+}
+
 export default function ChapterContent({ scene, animationDurationMs, language = 'cn' }: { scene: ChapterScene | null; animationDurationMs: number; language?: Language }) {
+  const [emailCopied, setEmailCopied] = useState(false);
   if (!scene || scene === 'home') return null;
   const siteCopy = getSiteCopy(language);
+
+  async function handleCopyEmail() {
+    try {
+      await copyText(siteCopy.join.email);
+      setEmailCopied(true);
+      window.setTimeout(() => setEmailCopied(false), 1800);
+    } catch {
+      setEmailCopied(false);
+    }
+  }
 
   if (scene === 'pink') {
     const delays = staggeredRevealDelays(2 + siteCopy.about.paragraphs.flat().length, animationDurationMs);
@@ -36,10 +66,14 @@ export default function ChapterContent({ scene, animationDurationMs, language = 
       <p className="chapter-reveal" style={{ animationDelay: `${delays[4]}ms` }}>{siteCopy.join.founder.paragraph}</p>
     </div>
     <div className="join-contact chapter-reveal" style={{ animationDelay: `${delays[5]}ms` }}>
-      <a href={`mailto:${siteCopy.join.email}`} aria-label={`${siteCopy.ui.emailAria} ${siteCopy.join.email}`}>
-        <svg className="join-email-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.5" /><path d="m4 7 8 6 8-6" /></svg>
+      <a className="join-contact-action join-contact-action--email" href={`mailto:${siteCopy.join.email}`} aria-label={`${siteCopy.ui.emailAria} ${siteCopy.join.email}`}>
         <span className="join-email-action">{siteCopy.ui.email}</span>
+        <svg className="join-action-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
       </a>
+      <button className="join-contact-action join-contact-action--copy" type="button" onClick={handleCopyEmail} aria-label={`${siteCopy.ui.copyEmailAria}: ${siteCopy.join.email}`}>
+        <svg className="join-copy-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="3" width="11" height="13" rx="2" /><rect x="3" y="8" width="11" height="13" rx="2" /></svg>
+        <span aria-live="polite">{emailCopied ? siteCopy.ui.emailCopied : siteCopy.ui.copyEmail}</span>
+      </button>
     </div>
     <p className="chapter-reveal" style={{ animationDelay: `${delays[6]}ms` }}>{siteCopy.join.locations}</p>
   </section>;

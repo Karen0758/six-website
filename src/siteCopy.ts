@@ -1,5 +1,7 @@
 export type Language = 'en' | 'cn';
 
+export const CONTACT_EMAIL = 'helloworld@sixfund.org';
+
 const copy = {
   cn: {
     home: {
@@ -40,7 +42,7 @@ const copy = {
         heading: '如果你是需要支持的冒险家——',
         paragraph: '我们给你初创期的判断力、关系和资源，和你需要时，真正的在场。',
       },
-      email: 'xiaozhege@six.com',
+      email: CONTACT_EMAIL,
       locations: '同时，你可以在北京、上海、香港、多伦多、密特罗尼西亚见到我们。',
     },
     ui: {
@@ -60,6 +62,9 @@ const copy = {
       main: 'SIX 官网首页主视觉，可点击人物卡片或向下滚动依次体验三段动作',
       email: '发邮件',
       emailAria: '发送邮件至',
+      copyEmail: '复制邮箱',
+      copyEmailAria: '复制邮箱地址',
+      emailCopied: '已复制',
       seatedFigure: '坐着的女性',
       middleFigureImage: '转向镜头的女性',
       walkingFigure: '从左侧走入的女性',
@@ -105,7 +110,7 @@ const copy = {
         heading: 'If you are a founder looking for support',
         paragraph: 'We bring early-stage judgment, relationships, and resources—and, when you need it, real presence.',
       },
-      email: 'xiaozhege@six.com',
+      email: CONTACT_EMAIL,
       locations: 'You can also find us in Beijing, Shanghai, Hong Kong, Toronto, and Micronesia.',
     },
     ui: {
@@ -123,8 +128,11 @@ const copy = {
       middleFigure: 'Select the central figure to explore our approach and watch her turn',
       thirdFigure: 'Select the beige area to learn how to join and watch the final animation',
       main: 'SIX homepage. Select a figure or scroll down to explore the three animated chapters.',
-      email: 'Email us',
+      email: 'Email Us',
       emailAria: 'Send an email to',
+      copyEmail: 'Copy Email',
+      copyEmailAria: 'Copy email address',
+      emailCopied: 'Copied',
       seatedFigure: 'Woman seated on the ground',
       middleFigureImage: 'Woman turning toward the camera',
       walkingFigure: 'Woman walking in from the left',

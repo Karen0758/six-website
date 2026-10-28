@@ -20,6 +20,7 @@ test('homepage typography gives SIX the largest restrained display style', () =>
   assert.match(styles, /\.headline-title span:last-child\s*\{\s*font-size:\s*inherit;/);
   assert.match(styles, /font-family:\s*"SIX Noto Serif SC", "Source Han Serif SC"/);
   assert.match(styles, /:root\s*\{[^}]*SIX Noto Sans SC[^}]*Source Han Sans SC/s);
+  assert.match(styles, /\.scene--english,\s*\.scene--english button,\s*\.scene--english a\s*\{[^}]*font-family:\s*"Newsreader"/s);
   assert.doesNotMatch(styles, /wordmark-ripple|\.brand-wordmark::before|\.brand-wordmark::after/);
   assert.match(styles, /\.chapter-content--yellow\s*\{[^}]*top:\s*16%/s);
 });

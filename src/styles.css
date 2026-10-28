@@ -167,6 +167,11 @@ body { overflow: hidden; }
   line-height: 1.18;
   letter-spacing: 0;
 }
+.scene--english,
+.scene--english button,
+.scene--english a {
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+}
 .scene--english .learn-more,
 .scene--english .figure-caption,
 .scene--english .scroll-cue,
@@ -183,7 +188,7 @@ body { overflow: hidden; }
   letter-spacing: 0;
 }
 .scene--english .chapter-content p,
-.scene--english .join-contact a { font-family: "Newsreader", Georgia, "Times New Roman", serif; }
+.scene--english .join-contact-action { font-family: "Newsreader", Georgia, "Times New Roman", serif; }
 .headline p { display: none; }
 .learn-more {
   position: absolute;
@@ -284,8 +289,31 @@ body { overflow: hidden; }
 .chapter-content--beige h2 { grid-column: 1 / -1; }
 .chapter-content--beige h3 { margin-top: .65em; }
 .join-path a { color: inherit; font-size: clamp(15px, 1.2vw, 19px); text-underline-offset: .2em; }
-.join-contact a { display: inline-flex; align-items: center; gap: .5em; color: inherit; border-bottom: 1px solid currentColor; padding-bottom: 3px; text-decoration: none; font-size: clamp(15px, 1.2vw, 19px); }
-.join-email-icon { display: block; width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.join-contact { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: .35em; }
+.join-contact-action {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6em;
+  border: 1px solid rgb(50 27 39 / 18%);
+  border-radius: 999px;
+  padding: 11px 20px;
+  color: inherit;
+  background: rgb(255 255 255 / 54%);
+  text-decoration: none;
+  font: inherit;
+  font-size: clamp(15px, 1.2vw, 19px);
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.join-contact-action--email { border-color: #1d1e20; background: #1d1e20; color: #fff; }
+.join-contact-action:hover { border-color: currentColor; }
+.join-contact-action--email:hover { background: #323337; }
+.join-contact-action:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.join-action-arrow,
+.join-copy-icon { display: block; width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
 .scroll-cue {
   position: absolute;
@@ -416,8 +444,8 @@ body { overflow: hidden; }
   .work-principles strong { font-size: 19px; }
   .chapter-content--beige h3 { font-size: 18px; margin: .9em 0 .35em; }
   .chapter-content--beige p { font-size: clamp(13px, min(3.7vw, 1.85svh), 15px); line-height: 1.72; margin-bottom: .85em; }
-  .join-contact { margin: .35em 0 .7em; }
-  .join-contact a { font-size: 15px; }
+  .join-contact { gap: 9px; margin: .45em 0 .85em; }
+  .join-contact-action { min-height: 44px; padding: 10px 16px; font-size: 15px; }
   .scroll-cue { right: 5%; bottom: 3%; font-size: 13px; }
   .return-home {
     right: 5%;
