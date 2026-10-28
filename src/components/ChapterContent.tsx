@@ -47,8 +47,11 @@ export default function ChapterContent({ scene, animationDurationMs, language = 
       <div className="founders-page-inner">
         <div className="founders-page-heading chapter-reveal">
           <h2 id="chapter-founders-title">
-            {foundersHeading.startsWith('SIX')
-              ? <><span className="founders-heading-brand">SIX</span>{foundersHeading.slice(3)}</>
+            {language === 'cn' && foundersHeading.startsWith('SIX')
+              ? <>
+                <span className="founders-heading-desktop"><span className="founders-heading-brand">SIX</span>{foundersHeading.slice(3)}</span>
+                <span className="founders-heading-mobile"><span><span className="founders-heading-brand">Six</span> 的</span><span>发起合伙人们</span></span>
+              </>
               : foundersHeading}
           </h2>
         </div>

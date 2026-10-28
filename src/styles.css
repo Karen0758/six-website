@@ -366,6 +366,7 @@ body { overflow: hidden; }
 .chapter-content--founders h2 { display: block; margin-bottom: .5em; line-height: 1.25; letter-spacing: 0; text-wrap: balance; }
 .founders-brand { flex: 0 0 auto; font-family: "Newsreader"; font-size: .92em; font-weight: 500; letter-spacing: .015em; line-height: 1; }
 .founders-heading-brand { display: inline-block; vertical-align: baseline; font-family: "Newsreader"; font-size: 1.12em; font-weight: 500; line-height: 1; letter-spacing: -.025em; margin-right: .08em; }
+.founders-heading-mobile { display: none; }
 .chapter-content--founders .founders-claims { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(28px, 5vw, 90px); }
 .chapter-content--founders .founders-claims li { padding: 1.25em 0; }
 .chapter-content--founders .founders-claims li:nth-child(-n+2) { border-top: 0; }
@@ -398,6 +399,10 @@ body { overflow: hidden; }
   font-family: inherit;
   text-align: left;
   cursor: pointer;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
 }
 .founder-claim::before {
   position: absolute;
@@ -412,7 +417,8 @@ body { overflow: hidden; }
   mask-image: radial-gradient(ellipse at center, #000 52%, transparent 78%);
   mix-blend-mode: multiply;
 }
-.founder-claim:hover::before, .founder-claim:focus-visible::before, .founder-claim.is-active::before { opacity: .2; transform: scale(1) rotate(0); }
+.founder-claim:hover::before, .founder-claim:focus-visible::before, .founder-claim:active::before, .founder-claim.is-active::before { opacity: .2; transform: scale(1) rotate(0); }
+.founder-claim:active::before, .founder-claim.is-active::before { transition: none; }
 .founder-claim:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
 .founder-claim > span { font: 500 clamp(48px, 5vw, 76px)/.92 "Newsreader"; }
 .founder-claim > p { position: relative; z-index: 1; margin: 0; line-height: var(--editor-line-height, 1.65); }
@@ -585,13 +591,24 @@ body { overflow: hidden; }
   .chapter-content--founders .founders-claims { display: block; }
   .chapter-content--founders .founders-page-heading { margin-bottom: 16px; }
   .chapter-content--founders h2 { margin-bottom: .5em; }
+  .founders-heading-desktop { display: none; }
+  .founders-heading-mobile { display: flex; flex-direction: column; align-items: flex-start; gap: .02em; }
+  .founders-heading-mobile > span { display: block; }
+  .founders-heading-mobile .founders-heading-brand { margin-right: .12em; }
   .chapter-content--founders .founders-claims li { padding: .5em 0; }
   .chapter-content--founders .founders-claims li:nth-child(2) { border-top: 1px solid rgb(50 27 39 / 30%); }
   .chapter-content--founders .founders-claims li p { font-size: clamp(11px, 3.15vw, 14px); line-height: var(--editor-line-height, 1.48); }
   .chapter-content--founders h2 { margin-bottom: .22em; font-size: clamp(34px, 10.5vw, 48px); line-height: 1.18; }
   .founder-claim { grid-template-columns: 54px minmax(0, 1fr); gap: 18px; padding: .36em .1em; }
   .founder-claim > span { font-size: clamp(38px, 10vw, 50px); }
-  .chapter-content--yellow { top: clamp(64px, 12svh, 112px); max-height: 42svh; }
+  .chapter-content--yellow {
+    top: clamp(38px, 6svh, 62px);
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+  .chapter-content--yellow h2 { margin-bottom: .18em; }
+  .chapter-content--yellow .work-principles li { margin-bottom: clamp(.3em, 1.1svh, .65em); }
   .chapter-content--beige {
     display: block;
     top: max(4svh, 28px);
