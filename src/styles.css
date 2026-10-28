@@ -342,7 +342,7 @@ body { overflow: hidden; }
 .about-page-inner { width: 100%; padding-bottom: 12px; }
 .chapter-content--pink h2 { margin-bottom: .3em; }
 .chapter-content--pink .chapter-statement { margin-bottom: .6em; font-family: "SIX Noto Serif SC"; font-size: var(--chapter-subtitle-size); line-height: 1.45; }
-.chapter-content--pink .about-introduction { margin-bottom: 1.5em; font-size: var(--chapter-body-size); }
+.chapter-content--pink .about-introduction { margin-bottom: 0; font-size: var(--chapter-body-size); }
 .chapter-content--pink p { line-height: 2.5; }
 .founders-inline { border-top: 1px solid currentColor; border-bottom: 1px solid currentColor; padding: clamp(16px, 1.6vw, 24px) 0; }
 .founders-inline-header { display: grid; grid-template-columns: clamp(74px, 8vw, 116px) minmax(0, 1fr); align-items: center; gap: clamp(16px, 1.6vw, 24px); }
@@ -386,8 +386,8 @@ body { overflow: hidden; }
 .founder-claim > span { font: 500 clamp(48px, 5vw, 76px)/.92 "Newsreader"; }
 .founder-claim > p { position: relative; z-index: 1; margin: 0; line-height: 1.65; }
 .chapter-content .founders-claims li p { margin: 0; line-height: 1.65; }
-.about-closing { padding-top: 1.7em; }
-.chapter-content .about-closing p { margin-bottom: 1.1em; font-family: inherit; font-size: var(--chapter-body-size); font-weight: 400; }
+.about-closing { padding-top: 0; }
+.chapter-content .about-closing p { margin-bottom: 1.1em; font-family: inherit; font-size: var(--chapter-body-size); font-weight: 400; white-space: pre-line; }
 .join-contribution-amount { font: 500 clamp(28px, 2.7vw, 42px)/1.2 "Newsreader"; letter-spacing: -.025em; }
 .chapter-content--yellow { top: 16%; right: 4%; width: min(39vw, 600px); }
 .chapter-content--yellow h3 { border-top: 1px solid currentColor; padding-top: 1em; }
