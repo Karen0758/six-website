@@ -19,6 +19,8 @@ test('each animation chapter displays the local 10/25 draft with Chinese punctua
     assert.ok(!about.includes('管理过中国大陆规模最大的性别视角投资'));
     const founders = render('founders');
     assert.ok(founders.includes('管理过中国大陆规模最大的性别视角投资'));
+    assert.match(founders, /class="founders-heading-brand">SIX<\/span> 的/);
+    assert.doesNotMatch(founders, /class="founders-heading-brand">Six<\/span>/);
 
     const work = render('yellow');
     for (const phrase of ['品味', '信任', '长期', '能落地的创造力。', '坦诚的从头再来。']) assert.ok(work.includes(phrase));

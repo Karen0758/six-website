@@ -23,6 +23,7 @@ test('homepage typography gives SIX the largest restrained display style', () =>
   assert.match(styles, /\.scene--english,\s*\.scene--english button,\s*\.scene--english a\s*\{[^}]*font-family:\s*"Newsreader"[^}]*font-weight:\s*500/s);
   assert.match(styles, /\.scene--english \.learn-more,\s*\.scene--english \.figure-caption\s*\{\s*font-size:\s*clamp\(16px,\s*1\.35vw,\s*21px\)/s);
   assert.match(styles, /\.scene--english \.chapter-content \.about-closing p,[\s\S]*?font-family:\s*"Newsreader";[^}]*font-weight:\s*500/s);
+  assert.match(styles, /\.founders-heading-brand\s*\{[^}]*font-family:\s*"Newsreader";[^}]*font-weight:\s*500/s);
   assert.match(styles, /@media \(max-width:\s*700px\)[\s\S]*?\.scene--english \.chapter-content,[\s\S]*?\.scene--english \.chapter-content \.about-closing p,[\s\S]*?font-family:\s*"Newsreader";[^}]*font-weight:\s*500;/s);
   assert.match(styles, /@media \(max-width:\s*700px\)[\s\S]*?\.join-contact-action\s*\{[^}]*min-height:\s*44px;[^}]*font-size:\s*15px;/s);
   assert.doesNotMatch(styles, /wordmark-ripple|\.brand-wordmark::before|\.brand-wordmark::after/);
