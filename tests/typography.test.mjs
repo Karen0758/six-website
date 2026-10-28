@@ -29,3 +29,7 @@ test('homepage typography gives SIX the largest restrained display style', () =>
   assert.doesNotMatch(styles, /wordmark-ripple|\.brand-wordmark::before|\.brand-wordmark::after/);
   assert.match(styles, /\.chapter-content--yellow\s*\{[^}]*top:\s*16%/s);
 });
+
+test('English About Us locks every text group to Newsreader Medium', () => {
+  assert.match(styles, /\.scene--english \.chapter-content--pink,[\s\S]*?\.scene--english \.chapter-content--pink \.about-closing p\s*\{[^}]*font-family:\s*"Newsreader";[^}]*font-style:\s*normal;[^}]*font-weight:\s*500;[^}]*font-synthesis:\s*none;/s);
+});

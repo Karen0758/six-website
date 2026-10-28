@@ -197,6 +197,16 @@ body { overflow: hidden; }
 }
 .scene--english .chapter-content .about-closing p,
 .scene--english .join-contact-action { font-family: "Newsreader"; font-style: normal; font-weight: 500; }
+.scene--english .chapter-content--pink,
+.scene--english .chapter-content--pink h2,
+.scene--english .chapter-content--pink .chapter-statement,
+.scene--english .chapter-content--pink .about-introduction,
+.scene--english .chapter-content--pink .about-closing p {
+  font-family: "Newsreader";
+  font-style: normal;
+  font-weight: 500;
+  font-synthesis: none;
+}
 .headline p { display: none; }
 .learn-more {
   position: absolute;
