@@ -97,6 +97,8 @@ export default function ChapterContent({ scene, animationDurationMs, language = 
   const contributorHeading = text('contributorHeading', siteCopy.join.contributor.heading).replace(/\s+/g, ' ');
   const contributorHeadingParts = contributorHeading.split(/(SIX的|SIX|成为|正式会员|正式成员)/g);
   const contactEmail = text('email', siteCopy.join.email);
+  const locations = text('locations', siteCopy.join.locations);
+  const newYorkIndex = language === 'en' ? locations.indexOf('New York') : -1;
   async function handleCopyEmail() {
     try {
       await copyText(contactEmail);
@@ -126,6 +128,10 @@ export default function ChapterContent({ scene, animationDurationMs, language = 
         <span aria-live="polite">{emailCopied ? siteCopy.ui.emailCopied : siteCopy.ui.copyEmail}</span>
       </button>
     </div>
-    <p className="chapter-reveal" style={{ animationDelay: `${delays[6]}ms` }}>{text('locations', siteCopy.join.locations)}</p>
+    <p className="join-locations chapter-reveal" style={{ animationDelay: `${delays[6]}ms` }}>
+      {newYorkIndex >= 0
+        ? <>{locations.slice(0, newYorkIndex).trimEnd()}<br />{locations.slice(newYorkIndex)}</>
+        : locations}
+    </p>
   </section>;
 }

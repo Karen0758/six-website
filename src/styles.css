@@ -729,7 +729,13 @@ body { overflow: hidden; }
     transform: translateX(-50%);
     font-size: 13px;
   }
-  .scene--yellow .scroll-cue { bottom: .75%; }
+  .scene--yellow .scroll-cue {
+    right: max(5%, env(safe-area-inset-right));
+    left: auto;
+    bottom: max(2.5svh, env(safe-area-inset-bottom));
+    transform: none;
+    align-items: flex-end;
+  }
   .return-home {
     z-index: 30;
     right: 5%;

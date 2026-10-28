@@ -72,6 +72,7 @@ test('English chapters render English copy and email controls', async () => {
     assert.ok(join.includes('Copy email address: helloworld@sixfund.org'));
     assert.match(join, /href="mailto:helloworld@sixfund\.org"/);
     assert.match(join, /<button[^>]*class="join-contact-action join-contact-action--copy"[^>]*type="button"/);
+    assert.match(join, /Toronto,\s*<br\/>New York, and Micronesia\./);
     assert.ok(!/[\u3400-\u9fff]/.test(about + founders + work + join), 'English chapters should contain no Chinese text');
   } finally {
     await vite.close();
